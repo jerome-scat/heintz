@@ -366,40 +366,39 @@ const PNL={cols:["2024","2025","Budget 2026"],
 };
 
 
-// ========== RSE Data ==========
+// ========== RSE Data (cohérent : 14 hôtels, 1 004 ch., ~249k nuitées/an) ==========
 const RSE_DATA={
-    carbone:{total:4520,
-        scopes:[{l:"Scope 1 — Émissions directes",v:1250,c:"#ef4444",detail:[{l:"Chauffage gaz",v:980},{l:"Véhicules service",v:270}]},
-                {l:"Scope 2 — Énergie indirecte",v:780,c:"#f59e0b",detail:[{l:"Électricité",v:650},{l:"Réseau de chaleur",v:130}]},
-                {l:"Scope 3 — Autres indirectes",v:2490,c:"#94a3b8",detail:[{l:"Achats F&B",v:680},{l:"Linge & produits",v:420},{l:"Déplacements clients",v:850},{l:"Traitement déchets",v:280},{l:"Consommation eau",v:260}]}],
-        evo:[{a:"2022",v:5200},{a:"2023",v:4900},{a:"2024",v:4680},{a:"2025",v:4520},{a:"2026P",v:4200},{a:"2028Obj",v:3800},{a:"2030Obj",v:3616}],
-        parChambre:4.5,benchmark:6.2,objectif2030:3616
+    carbone:{total:4180,
+        scopes:[{l:"Scope 1 — Émissions directes",v:1480,c:"#ef4444",detail:[{l:"Chauffage gaz/fioul",v:1080},{l:"Fluides frigorigènes",v:220},{l:"Véhicules de service",v:180}]},
+                {l:"Scope 2 — Énergie indirecte",v:540,c:"#f59e0b",detail:[{l:"Électricité (facteur FR 79g)",v:460},{l:"Réseau de chaleur urbain",v:80}]},
+                {l:"Scope 3 — Autres indirectes",v:2160,c:"#94a3b8",detail:[{l:"Déplacements clients",v:720},{l:"Achats & sous-traitance",v:580},{l:"Linge & blanchisserie",v:380},{l:"Traitement déchets",v:260},{l:"Numérique & IT",v:220}]}],
+        evo:[{a:"2022",v:4850},{a:"2023",v:4620},{a:"2024",v:4380},{a:"2025",v:4180},{a:"2026P",v:3900},{a:"2028Obj",v:3500},{a:"2030Obj",v:3340}],
+        parChambre:4.2,benchmark:6.5,objectif2030:3340
     },
-    energie:{conso:2850,kwh_m2:127,benchmark:180,
-        parType:[{l:"Électricité",v:1850,c:"#f59e0b"},{l:"Gaz naturel",v:780,c:"#ef4444"},{l:"Réseau chaleur",v:220,c:"#8b5cf6"}],
-        evo:[{a:"2022",v:3200},{a:"2023",v:3050},{a:"2024",v:2920},{a:"2025",v:2850}]},
-    eau:{total:91800,parNuitee:250,benchmark:300,objectif:200,unite:"L"},
-    dechets:{total:440,parNuitee:1.2,benchmark:1.5,tri:62,objectifTri:80,unite:"kg",
+    energie:{conso:11200,kwh_chambre:11155,benchmark_chambre:14500,
+        parType:[{l:"Électricité",v:5800,c:"#f59e0b"},{l:"Gaz naturel",v:4600,c:"#ef4444"},{l:"Réseau de chaleur",v:800,c:"#8b5cf6"}],
+        evo:[{a:"2022",v:12800},{a:"2023",v:12100},{a:"2024",v:11600},{a:"2025",v:11200}]},
+    eau:{total:64200,parNuitee:251,benchmark:300,objectif:200,unite:"L"},
+    dechets:{total:334,parNuitee:1.3,benchmark:1.8,tri:62,objectifTri:80,unite:"kg",
         parType:[{l:"Ordures ménagères",v:38,c:"#94a3b8"},{l:"Carton/Papier",v:24,c:"#d4a853"},{l:"Verre",v:15,c:"#10b981"},{l:"Plastique",v:12,c:"#3b82f6"},{l:"Biodéchets",v:8,c:"#059669"},{l:"Autres",v:3,c:"#78350f"}]},
     actions:[
-        {l:"LED 100% établissements",st:"Fait",prg:100,cat:"Énergie",eco:"−45 MWh/an"},
+        {l:"LED 100% établissements",st:"Fait",prg:100,cat:"Énergie",eco:"−520 MWh/an"},
         {l:"Suppression plastique usage unique",st:"Fait",prg:100,cat:"Déchets",eco:"−2,1 t/an"},
-        {l:"Produits entretien éco-certifiés",st:"En cours",prg:85,cat:"Achats",eco:"−12 tCO₂e"},
+        {l:"Produits entretien éco-certifiés",st:"En cours",prg:85,cat:"Achats",eco:"−35 tCO₂e"},
         {l:"Tri sélectif 5 flux (14 sites)",st:"En cours",prg:72,cat:"Déchets",eco:"+18 pts tri"},
         {l:"Circuits courts F&B (−30% import)",st:"En cours",prg:45,cat:"Achats",eco:"−95 tCO₂e"},
         {l:"Bornes recharge VE (6 sites)",st:"En cours",prg:35,cat:"Mobilité",eco:"Attractivité"},
-        {l:"Audit énergétique DPE tous sites",st:"Planifié",prg:10,cat:"Énergie",eco:"Base travaux"},
+        {l:"Audit énergétique DPE (14 sites)",st:"Planifié",prg:10,cat:"Énergie",eco:"Base travaux"},
         {l:"Panneaux solaires (3 sites pilotes)",st:"Planifié",prg:5,cat:"Énergie",eco:"−180 MWh/an"},
-        {l:"Récupération eaux grises",st:"Étude",prg:0,cat:"Eau",eco:"−15% conso"},
-        {l:"Compensation carbone volontaire",st:"Étude",prg:0,cat:"Carbone",eco:"Neutralité"}
+        {l:"Récupération eaux grises",st:"Étude",prg:0,cat:"Eau",eco:"−15% conso eau"},
+        {l:"Compensation carbone volontaire",st:"Étude",prg:0,cat:"Carbone",eco:"Neutralité 2035"}
     ],
     labels:[
-        {l:"Clef Verte",n:11,total:14,c:"#10b981"},
+        {l:"Clef Verte",n:10,total:14,c:"#10b981"},
         {l:"Accueil Vélo",n:7,total:14,c:"#3b82f6"},
-        {l:"Écolabel Européen",n:0,total:14,c:"#8b5cf6",obj:"3 sites en 2027"}
+        {l:"Écolabel Européen",n:0,total:14,c:"#8b5cf6",obj:"3 sites visés en 2027"}
     ]
 };
-
 // ========== TABS ==========
 const TABS=[
     {id:"daily",label:"Journalier",icon:Ic.sun},
@@ -410,6 +409,7 @@ const TABS=[
     {id:"couts",label:"Coûts",icon:Ic.chrt},
     {id:"immobilier",label:"Immobilière",icon:Ic.bld},
     {id:"budget",label:"Budget 2026",icon:Ic.calc},
+    {id:"pilotage",label:"Pilotage CDG",icon:<svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/></svg>},
     {id:"etablissements",label:"Établissements",icon:Ic.map},
     {id:"roadmap",label:"Roadmap",icon:Ic.clip},
     {id:"rse",label:"RSE",icon:<svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064"/></svg>},
@@ -580,10 +580,15 @@ const GlobalePage=()=>{
                 <div className="mt-3 border-t pt-3">
                     <div className="text-xs font-semibold text-gray-700 mb-2">Calendrier événementiel Grand Est</div>
                     <div className="grid grid-cols-6 md:grid-cols-12 gap-1">
-                        {EVENTS.map(e=><div key={e.m} className={"rounded-lg p-1.5 text-center text-[9px] "+(e.impact>=10?"bg-green-100 text-green-800":e.impact>=5?"bg-blue-50 text-blue-700":e.impact>0?"bg-gray-50 text-gray-600":"bg-red-50 text-red-600")} title={e.nom}>
+                        {EVENTS.map(e=><div key={e.m} className={"group relative rounded-lg p-1.5 text-center text-[9px] cursor-pointer "+(e.impact>=10?"bg-green-100 text-green-800":e.impact>=5?"bg-blue-50 text-blue-700":e.impact>0?"bg-gray-50 text-gray-600":"bg-red-50 text-red-600")}>
                             <div className="font-bold">{MFR[e.m-1]}</div>
-                            <div className="truncate">{e.ico}</div>
+                            <div>{e.ico}</div>
                             <div className="font-semibold">{e.impact>0?"+":""}{e.impact}%</div>
+                            <div className="hidden group-hover:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2.5 bg-gray-900 text-white rounded-lg shadow-xl z-50 text-left pointer-events-none">
+                                <div className="font-bold text-[11px] mb-1">{e.nom}</div>
+                                <div className="text-[10px] opacity-75 mb-0.5">Type : <span className="capitalize">{e.type}</span></div>
+                                <div className="text-[10px]">Impact TO : <span className={e.impact>0?"text-green-400":"text-red-400"}>{e.impact>0?"+":""}{e.impact}%</span></div>
+                            </div>
                         </div>)}
                     </div>
                 </div>
@@ -1262,13 +1267,13 @@ const RsePage=()=>{
 
         <div className="grid md:grid-cols-3 gap-4">
             <div className="bg-white rounded-xl shadow-sm p-4">
-                <Sec>Énergie — {R.energie.kwh_m2} kWh/m²</Sec>
+                <Sec>Énergie — {fmt(R.energie.kwh_chambre)} kWh/chambre</Sec>
                 <ResponsiveContainer width="100%" height={160}>
                     <PieChart><Pie data={R.energie.parType} dataKey="v" nameKey="l" cx="50%" cy="50%" outerRadius={60} label={({l,v})=>l+" "+fmt(v)} labelLine={false} fontSize={9}>
                     {R.energie.parType.map((d,i)=><Cell key={i} fill={d.c}/>)}</Pie><Tooltip/></PieChart>
                 </ResponsiveContainer>
-                <div className="mt-2"><div className="flex justify-between text-xs mb-1"><span className="text-muted">vs benchmark ({R.energie.benchmark} kWh/m²)</span><span className="font-bold text-green-600">−{Math.round((1-R.energie.kwh_m2/R.energie.benchmark)*100)}%</span></div>
-                <div className="w-full bg-gray-200 rounded-full h-2"><div className="bg-green-500 h-2 rounded-full" style={{width:Math.round(R.energie.kwh_m2/R.energie.benchmark*100)+"%"}}></div></div></div>
+                <div className="mt-2"><div className="flex justify-between text-xs mb-1"><span className="text-muted">vs benchmark ({fmt(R.energie.benchmark_chambre)} kWh/chambre)</span><span className="font-bold text-green-600">−{Math.round((1-R.energie.kwh_chambre/R.energie.benchmark_chambre)*100)}%</span></div>
+                <div className="w-full bg-gray-200 rounded-full h-2"><div className="bg-green-500 h-2 rounded-full" style={{width:Math.round(R.energie.kwh_chambre/R.energie.benchmark_chambre*100)+"%"}}></div></div></div>
             </div>
             <div className="bg-white rounded-xl shadow-sm p-4">
                 <Sec>Eau — {R.eau.parNuitee} L/nuitée</Sec>
@@ -1328,12 +1333,239 @@ const RsePage=()=>{
     </div>);
 };
 
+
+// ===== PILOTAGE CDG PAGE =====
+const PilotagePage=()=>{
+    const [benchTri,setBenchTri]=useState("caCh");
+    const totalCA=H.reduce((s,h)=>s+h.ca,0);
+    const cm=TODAY.getMonth();
+
+    // Écarts Budget vs Réel (allocation proportionnelle au CA)
+    const ecarts=useMemo(()=>{
+        return H.map(h=>{
+            const share=h.ca/totalCA;
+            const bgYtd=Math.round(MCB.slice(0,cm+1).reduce((s,m)=>s+m.bg,0)*share);
+            const rlYtd=Math.round(MCB.slice(0,cm+1).reduce((s,m)=>s+m.ca,0)*share);
+            const ec=bgYtd>0?((rlYtd-bgYtd)/bgYtd*100):0;
+            return{n:h.n,v:h.v,bgYtd,rlYtd,ecart:Math.round(ec*10)/10,
+                st:Math.abs(ec)<=3?"Conforme":ec>3?"Surperformance":ec>-5?"Vigilance":"Alerte"};
+        }).sort((a,b)=>a.ecart-b.ecart);
+    },[]);
+    const alertCount=ecarts.filter(e=>e.st==="Alerte").length;
+    const vigCount=ecarts.filter(e=>e.st==="Vigilance").length;
+    const surCount=ecarts.filter(e=>e.st==="Surperformance").length;
+
+    // Benchmarking inter-établissements
+    const bench=useMemo(()=>{
+        return H.map(h=>({
+            n:h.n,v:h.v,ch:h.ch,e:h.e,
+            caCh:Math.round(h.ca*1000/h.ch),
+            to:h.to,adr:h.adr,rp:h.rp,
+            gopPct:h.gp,
+            gopCh:Math.round(h.ca*h.gp/100*1000/h.ch)
+        })).sort((a,b)=>b[benchTri]-a[benchTri]);
+    },[benchTri]);
+
+    const avgCaCh=Math.round(bench.reduce((s,b)=>s+b.caCh,0)/bench.length);
+    const avgGopCh=Math.round(bench.reduce((s,b)=>s+b.gopCh,0)/bench.length);
+    const avgTo=Math.round(bench.reduce((s,b)=>s+b.to,0)/bench.length);
+    const avgRp=Math.round(bench.reduce((s,b)=>s+b.rp*10,0)/bench.length)/10;
+
+    // CAPEX
+    const capex=RDM.filter(r=>r.bud>100);
+    const capexTotal=capex.reduce((s,r)=>s+r.bud,0);
+    const capexDep=capex.reduce((s,r)=>s+r.dep,0);
+
+    // DSCR
+    const gopHot=H.reduce((s,h)=>s+h.ca*h.gp/100,0);
+    const dscrHot=gopHot/GRP.hot.remb;
+    const dscrImmo=IMM.loyN/IMM.remb;
+    const dscrCons=(gopHot+IMM.loyN)/GRP.cons.rembT;
+
+    // Rolling Forecast
+    const rfData=useMemo(()=>{
+        return MCB.map((m,i)=>{
+            if(i<=cm)return{m:m.m,reel:m.ca,bg:m.bg};
+            const simpl=Math.round(m.bg*FC.ratio);
+            const last3=MCB.slice(Math.max(0,cm-2),cm+1);
+            const t3=last3.reduce((s,x)=>s+x.ca/x.bg,0)/last3.length;
+            const roll=Math.round(m.bg*(t3*0.7+FC.ratio*0.3));
+            return{m:m.m,bg:m.bg,simpl,roll};
+        });
+    },[]);
+
+    const rfTotal={simpl:rfData.reduce((s,d)=>s+(d.reel||d.simpl),0),roll:rfData.reduce((s,d)=>s+(d.reel||d.roll),0),bg:rfData.reduce((s,d)=>s+d.bg,0)};
+
+    return(<div className="slide-enter space-y-6">
+        {/* KPIs */}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <KPI label="Alertes écart >5%" value={alertCount} color={alertCount>0?"danger":"success"} icon={Ic.wrn}/>
+            <KPI label="Vigilance 3-5%" value={vigCount} color={vigCount>0?"warning":"success"}/>
+            <KPI label="DSCR Hôtelier" value={dscrHot.toFixed(2)+"x"} color={dscrHot>=1.3?"success":dscrHot>=1?"warning":"danger"}/>
+            <KPI label="DSCR Consolidé" value={dscrCons.toFixed(2)+"x"} color={dscrCons>=1.3?"success":dscrCons>=1?"warning":"danger"}/>
+            <KPI label="CAPEX engagé" value={Math.round(capexDep/capexTotal*100)+"%"} unit={"de "+fK(capexTotal)} color="primary"/>
+        </div>
+
+        {/* Écarts Budget vs Réel */}
+        <div className="bg-white rounded-xl shadow-sm p-5">
+            <Sec right={<XBtn onClick={()=>xls(ecarts.map(e=>({Hotel:e.n,Ville:e.v,Budget_YTD:e.bgYtd,Reel_YTD:e.rlYtd,Ecart_pct:e.ecart,Statut:e.st})),"ecarts_budget")}/>}>Écarts Budget vs Réel — YTD {MFR[cm]} 2025</Sec>
+            {alertCount>0&&<div className="p-3 bg-red-50 rounded-lg text-xs text-red-700 mb-3 flex items-center gap-2">{Ic.wrn} <strong>{alertCount} établissement(s)</strong> en alerte — écart supérieur à 5% vs budget</div>}
+            <div className="overflow-x-auto"><table className="w-full text-xs">
+                <thead className="bg-gray-50"><tr>
+                    <th className="p-2 text-left text-muted">Établissement</th>
+                    <th className="p-2 text-right text-muted">Budget YTD</th>
+                    <th className="p-2 text-right text-muted">Réel YTD</th>
+                    <th className="p-2 text-right text-muted">Écart</th>
+                    <th className="p-2 text-center text-muted">Statut</th>
+                </tr></thead>
+                <tbody>{ecarts.map(e=><tr key={e.n} className="border-t border-gray-100 hover:bg-gray-50">
+                    <td className="p-2 font-medium">{e.n} <span className="text-muted text-[10px]">({e.v})</span></td>
+                    <td className="p-2 text-right">{fK(e.bgYtd)}</td>
+                    <td className="p-2 text-right">{fK(e.rlYtd)}</td>
+                    <td className={"p-2 text-right font-bold "+(e.ecart>0?"text-green-600":e.ecart<-5?"text-red-600":"text-orange-500")}>{e.ecart>0?"+":""}{e.ecart}%</td>
+                    <td className="p-2 text-center"><Bdg statut={e.st}/></td>
+                </tr>)}</tbody>
+            </table></div>
+            <div className="mt-3 p-2 bg-blue-50 rounded-lg text-[10px] text-blue-700">
+                💡 Allocation budgétaire proportionnelle au CA historique. Seuils : ±3% conforme, 3-5% vigilance, &gt;5% alerte.
+            </div>
+        </div>
+
+        {/* Benchmarking */}
+        <div className="bg-white rounded-xl shadow-sm p-5">
+            <Sec right={<div className="flex gap-1">
+                {[{k:"caCh",l:"CA/ch."},{k:"gopCh",l:"GOP/ch."},{k:"to",l:"TO %"},{k:"rp",l:"RevPAR"}].map(t=>
+                    <button key={t.k} onClick={()=>setBenchTri(t.k)} className={"px-2 py-1 rounded text-[10px] font-medium "+(benchTri===t.k?"bg-primary text-white":"bg-gray-100 text-gray-600 hover:bg-gray-200")}>{t.l}</button>
+                )}
+            </div>}>Benchmarking inter-établissements</Sec>
+            <div className="overflow-x-auto"><table className="w-full text-xs">
+                <thead className="bg-gray-50"><tr>
+                    <th className="p-2 text-left text-muted">Établissement</th>
+                    <th className="p-2 text-center text-muted">★</th>
+                    <th className="p-2 text-right text-muted">Ch.</th>
+                    <th className="p-2 text-right text-muted">CA/ch. €</th>
+                    <th className="p-2 text-right text-muted">TO %</th>
+                    <th className="p-2 text-right text-muted">ADR €</th>
+                    <th className="p-2 text-right text-muted">RevPAR €</th>
+                    <th className="p-2 text-right text-muted">GOP %</th>
+                    <th className="p-2 text-right text-muted">GOP/ch. €</th>
+                </tr></thead>
+                <tbody>
+                    {bench.map(b=><tr key={b.n} className="border-t border-gray-100 hover:bg-gray-50">
+                        <td className="p-2 font-medium">{b.n}</td>
+                        <td className="p-2 text-center text-yellow-500">{b.e}★</td>
+                        <td className="p-2 text-right">{b.ch}</td>
+                        <td className={"p-2 text-right font-semibold "+(b.caCh>=avgCaCh?"text-green-600":"text-red-500")}>{fmt(b.caCh)}</td>
+                        <td className={"p-2 text-right "+(b.to>=avgTo?"text-green-600":"text-orange-500")}>{b.to}%</td>
+                        <td className="p-2 text-right">{b.adr} €</td>
+                        <td className={"p-2 text-right "+(b.rp>=avgRp?"text-green-600":"text-orange-500")}>{b.rp} €</td>
+                        <td className="p-2 text-right">{b.gopPct}%</td>
+                        <td className={"p-2 text-right font-semibold "+(b.gopCh>=avgGopCh?"text-green-600":"text-red-500")}>{fmt(b.gopCh)}</td>
+                    </tr>)}
+                    <tr className="border-t-2 border-gray-300 bg-gray-50 font-bold">
+                        <td className="p-2" colSpan={3}>Moyenne groupe</td>
+                        <td className="p-2 text-right">{fmt(avgCaCh)}</td>
+                        <td className="p-2 text-right">{avgTo}%</td>
+                        <td className="p-2 text-right">—</td>
+                        <td className="p-2 text-right">{avgRp} €</td>
+                        <td className="p-2 text-right">—</td>
+                        <td className="p-2 text-right">{fmt(avgGopCh)}</td>
+                    </tr>
+                </tbody>
+            </table></div>
+        </div>
+
+        {/* Rolling Forecast + DSCR */}
+        <div className="grid md:grid-cols-3 gap-6">
+            <div className="md:col-span-2 bg-white rounded-xl shadow-sm p-5">
+                <Sec>Atterrissage glissant — Rolling Forecast vs Budget</Sec>
+                <ResponsiveContainer width="100%" height={280}>
+                    <ComposedChart data={rfData}><CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0"/>
+                    <XAxis dataKey="m" tick={{fontSize:10}} stroke="#94a3b8"/>
+                    <YAxis tick={{fontSize:10}} stroke="#94a3b8"/>
+                    <Tooltip content={<CTip/>}/>
+                    <Legend wrapperStyle={{fontSize:10}}/>
+                    <Bar dataKey="reel" fill="#1e3a5f" name="Réel" radius={[4,4,0,0]}/>
+                    <Bar dataKey="simpl" fill="rgba(16,185,129,0.5)" name="Forecast simple" radius={[4,4,0,0]}/>
+                    <Bar dataKey="roll" fill="rgba(139,92,246,0.5)" name="Rolling forecast" radius={[4,4,0,0]}/>
+                    <Line type="monotone" dataKey="bg" stroke="#d4a853" name="Budget" strokeWidth={2} dot={false}/>
+                    </ComposedChart>
+                </ResponsiveContainer>
+                <div className="grid grid-cols-3 gap-2 mt-3 text-xs">
+                    <div className="p-2 bg-gray-50 rounded-lg text-center"><span className="text-muted block">Budget</span><strong>{fK(rfTotal.bg)}</strong></div>
+                    <div className="p-2 bg-green-50 rounded-lg text-center"><span className="text-muted block">Forecast simple</span><strong className="text-green-700">{fK(rfTotal.simpl)}</strong></div>
+                    <div className="p-2 bg-purple-50 rounded-lg text-center"><span className="text-muted block">Rolling forecast</span><strong className="text-purple-700">{fK(rfTotal.roll)}</strong></div>
+                </div>
+                <div className="mt-2 p-2 bg-blue-50 rounded-lg text-[10px] text-blue-700">
+                    <strong>Rolling forecast</strong> : pondère la tendance 3 mois glissants (70%) + ratio YTD global (30%). Plus réactif aux inflexions récentes que le forecast proportionnel simple.
+                </div>
+            </div>
+            <div className="bg-white rounded-xl shadow-sm p-5">
+                <Sec>DSCR — Couverture de dette</Sec>
+                {[{l:"Hôtelier",v:dscrHot,gop:gopHot,remb:GRP.hot.remb},
+                  {l:"Immobilier",v:dscrImmo,gop:IMM.loyN,remb:IMM.remb},
+                  {l:"Consolidé",v:dscrCons,gop:gopHot+IMM.loyN,remb:GRP.cons.rembT}
+                ].map(d=><div key={d.l} className="mb-4 p-3 border rounded-xl">
+                    <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs font-semibold">{d.l}</span>
+                        <span className={"text-lg font-bold "+(d.v>=1.3?"text-green-600":d.v>=1?"text-orange-500":"text-red-600")}>{d.v.toFixed(2)}x</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-3 mb-1">
+                        <div className={"h-3 rounded-full "+(d.v>=1.3?"bg-green-500":d.v>=1?"bg-orange-400":"bg-red-500")} style={{width:Math.min(d.v/2*100,100)+"%"}}></div>
+                    </div>
+                    <div className="flex justify-between text-[10px] text-muted">
+                        <span>GOP : {fK(Math.round(d.gop))}</span>
+                        <span>Remb. : {fK(d.remb)}/an</span>
+                    </div>
+                </div>)}
+                <div className="p-2 bg-gray-50 rounded-lg text-[10px] text-muted mt-2">
+                    <strong>DSCR</strong> = Cash-flow opérationnel / Service de la dette annuel.<br/>
+                    Seuil confort : ≥ 1,30x · Vigilance : 1,00-1,30x · Critique : &lt; 1,00x
+                </div>
+            </div>
+        </div>
+
+        {/* CAPEX */}
+        <div className="bg-white rounded-xl shadow-sm p-5">
+            <Sec right={<span className="text-sm font-bold text-primary">{fmt(capexDep)} / {fmt(capexTotal)} K€ ({Math.round(capexDep/capexTotal*100)}%)</span>}>Suivi CAPEX & Investissements</Sec>
+            <div className="space-y-3">{capex.map(r=><div key={r.id} className="border rounded-xl p-3">
+                <div className="flex items-center justify-between mb-1">
+                    <div><span className="text-sm font-semibold">{r.nom}</span><span className="text-[10px] text-muted ml-2">{r.typ} · {r.resp}</span></div>
+                    <Bdg statut={r.st}/>
+                </div>
+                <div className="flex items-center gap-3">
+                    <div className="flex-1 bg-gray-200 rounded-full h-3">
+                        <div className={"h-3 rounded-full progress-bar "+(r.prg>=75?"bg-green-500":r.prg>=30?"bg-blue-500":"bg-gray-400")} style={{width:r.prg+"%"}}></div>
+                    </div>
+                    <span className="text-xs font-bold w-10 text-right">{r.prg}%</span>
+                </div>
+                <div className="flex gap-4 text-[10px] text-muted mt-1">
+                    <span>Budget : {fK(r.bud)}</span>
+                    <span>Engagé : {fK(r.dep)}</span>
+                    <span>Reste : {fK(r.bud-r.dep)}</span>
+                    <span>Échéance : {r.ech}</span>
+                </div>
+                {r.rsk&&<div className="mt-1 text-[10px] text-orange-600 flex items-center gap-1">{Ic.wrn} {r.rsk}</div>}
+            </div>)}</div>
+        </div>
+
+        {/* Export */}
+        <div className="flex justify-center gap-3 flex-wrap">
+            <button onClick={()=>window.print()} className="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl text-sm font-semibold hover:bg-opacity-90 shadow-lg">{Ic.dl} Générer reporting CODIR (PDF)</button>
+            <XBtn onClick={()=>xls([
+                ...ecarts.map(e=>({Section:"Écarts",Hotel:e.n,Ville:e.v,Budget_YTD_K:e.bgYtd,Reel_YTD_K:e.rlYtd,Ecart_pct:e.ecart,Statut:e.st})),
+                ...bench.map(b=>({Section:"Benchmark",Hotel:b.n,Chambres:b.ch,CA_par_chambre:b.caCh,TO_pct:b.to,ADR:b.adr,RevPAR:b.rp,GOP_pct:b.gopPct,GOP_par_chambre:b.gopCh}))
+            ],"pilotage_cdg")} label="Export Excel complet"/>
+        </div>
+    </div>);
+};
+
 // ===== APP COMPONENT =====
 const App=()=>{
     const [tab,setTab]=useState("daily");
     const totalCH=H.reduce((s,h)=>s+h.ch,0);
     const totalCA=H.reduce((s,h)=>s+h.ca,0);
-    const pages={daily:DailyPage,groupe:GroupePage,global:GlobalePage,pnl:PnlPage,tresorerie:TresoreriePage,couts:CoutsPage,immobilier:ImmobilierePage,budget:BudgetPage,etablissements:EtablissementsPage,roadmap:RoadmapPage,rse:RsePage,organigramme:OrganigrammePage};
+    const pages={daily:DailyPage,groupe:GroupePage,global:GlobalePage,pnl:PnlPage,tresorerie:TresoreriePage,couts:CoutsPage,immobilier:ImmobilierePage,budget:BudgetPage,pilotage:PilotagePage,etablissements:EtablissementsPage,roadmap:RoadmapPage,rse:RsePage,organigramme:OrganigrammePage};
     const Page=pages[tab]||DailyPage;
     return(
     <div className="min-h-screen bg-gray-50">
