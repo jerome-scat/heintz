@@ -59,6 +59,23 @@ const SEASON={
     weekly:[{j:"Lun",c:0.85},{j:"Mar",c:1.15},{j:"Mer",c:1.20},{j:"Jeu",c:1.12},{j:"Ven",c:1.05},{j:"Sam",c:0.82},{j:"Dim",c:0.62}]
 };
 
+
+// ========== ÉVÉNEMENTS Grand Est ==========
+const EVENTS=[
+    {m:1,nom:"Creux hivernal",impact:-5,type:"saison",ico:"❄️"},
+    {m:2,nom:"Vacances zone B",impact:3,type:"vacances",ico:"🎿"},
+    {m:3,nom:"Reprise printanière",impact:2,type:"saison",ico:"🌱"},
+    {m:4,nom:"Pâques & ponts",impact:5,type:"férié",ico:"🐣"},
+    {m:5,nom:"Ascension · Pentecôte",impact:8,type:"férié",ico:"🌷"},
+    {m:6,nom:"Festival Constellations Metz",impact:5,type:"culture",ico:"✨"},
+    {m:7,nom:"Pic estival · 14 Juillet",impact:10,type:"tourisme",ico:"☀️"},
+    {m:8,nom:"Mirabelle de Metz · 15 Août",impact:8,type:"culture",ico:"🍑"},
+    {m:9,nom:"Foire Int. Metz · Foire Châlons",impact:12,type:"foire",ico:"🎪"},
+    {m:10,nom:"Nancy Jazz Pulsations",impact:3,type:"culture",ico:"🎷"},
+    {m:11,nom:"Début Marchés de Noël",impact:5,type:"tourisme",ico:"🎄"},
+    {m:12,nom:"Marchés de Noël Metz · Strasbourg · Saint-Nicolas",impact:15,type:"tourisme",ico:"🎅"}
+];
+
 // ========== HOTELS — Données réelles plaquette 10/10/2025 ==========
 const H=[
     {id:1,n:"Ibis Styles Châlons",v:"Châlons-en-Champagne",lat:48.9567,lng:4.3634,ch:70,e:3,ca:2250,caM:0,prop:"Murs et fonds",acq:"Ouverture août 2017",reno:"—",lab:["Clef Verte"],ens:"Accor",fr:"Ibis Styles",to:76,adr:112,rp:85.1,gp:31.2,cc:62,dir:"Antoine Richard",tel:"03 26 65 60 60",eq:["PDJ inclus","Bar","Parking","Wifi","Séminaires"]},
@@ -348,6 +365,41 @@ const PNL={cols:["2024","2025","Budget 2026"],
     ]
 };
 
+
+// ========== RSE Data ==========
+const RSE_DATA={
+    carbone:{total:4520,
+        scopes:[{l:"Scope 1 — Émissions directes",v:1250,c:"#ef4444",detail:[{l:"Chauffage gaz",v:980},{l:"Véhicules service",v:270}]},
+                {l:"Scope 2 — Énergie indirecte",v:780,c:"#f59e0b",detail:[{l:"Électricité",v:650},{l:"Réseau de chaleur",v:130}]},
+                {l:"Scope 3 — Autres indirectes",v:2490,c:"#94a3b8",detail:[{l:"Achats F&B",v:680},{l:"Linge & produits",v:420},{l:"Déplacements clients",v:850},{l:"Traitement déchets",v:280},{l:"Consommation eau",v:260}]}],
+        evo:[{a:"2022",v:5200},{a:"2023",v:4900},{a:"2024",v:4680},{a:"2025",v:4520},{a:"2026P",v:4200},{a:"2028Obj",v:3800},{a:"2030Obj",v:3616}],
+        parChambre:4.5,benchmark:6.2,objectif2030:3616
+    },
+    energie:{conso:2850,kwh_m2:127,benchmark:180,
+        parType:[{l:"Électricité",v:1850,c:"#f59e0b"},{l:"Gaz naturel",v:780,c:"#ef4444"},{l:"Réseau chaleur",v:220,c:"#8b5cf6"}],
+        evo:[{a:"2022",v:3200},{a:"2023",v:3050},{a:"2024",v:2920},{a:"2025",v:2850}]},
+    eau:{total:91800,parNuitee:250,benchmark:300,objectif:200,unite:"L"},
+    dechets:{total:440,parNuitee:1.2,benchmark:1.5,tri:62,objectifTri:80,unite:"kg",
+        parType:[{l:"Ordures ménagères",v:38,c:"#94a3b8"},{l:"Carton/Papier",v:24,c:"#d4a853"},{l:"Verre",v:15,c:"#10b981"},{l:"Plastique",v:12,c:"#3b82f6"},{l:"Biodéchets",v:8,c:"#059669"},{l:"Autres",v:3,c:"#78350f"}]},
+    actions:[
+        {l:"LED 100% établissements",st:"Fait",prg:100,cat:"Énergie",eco:"−45 MWh/an"},
+        {l:"Suppression plastique usage unique",st:"Fait",prg:100,cat:"Déchets",eco:"−2,1 t/an"},
+        {l:"Produits entretien éco-certifiés",st:"En cours",prg:85,cat:"Achats",eco:"−12 tCO₂e"},
+        {l:"Tri sélectif 5 flux (14 sites)",st:"En cours",prg:72,cat:"Déchets",eco:"+18 pts tri"},
+        {l:"Circuits courts F&B (−30% import)",st:"En cours",prg:45,cat:"Achats",eco:"−95 tCO₂e"},
+        {l:"Bornes recharge VE (6 sites)",st:"En cours",prg:35,cat:"Mobilité",eco:"Attractivité"},
+        {l:"Audit énergétique DPE tous sites",st:"Planifié",prg:10,cat:"Énergie",eco:"Base travaux"},
+        {l:"Panneaux solaires (3 sites pilotes)",st:"Planifié",prg:5,cat:"Énergie",eco:"−180 MWh/an"},
+        {l:"Récupération eaux grises",st:"Étude",prg:0,cat:"Eau",eco:"−15% conso"},
+        {l:"Compensation carbone volontaire",st:"Étude",prg:0,cat:"Carbone",eco:"Neutralité"}
+    ],
+    labels:[
+        {l:"Clef Verte",n:11,total:14,c:"#10b981"},
+        {l:"Accueil Vélo",n:7,total:14,c:"#3b82f6"},
+        {l:"Écolabel Européen",n:0,total:14,c:"#8b5cf6",obj:"3 sites en 2027"}
+    ]
+};
+
 // ========== TABS ==========
 const TABS=[
     {id:"daily",label:"Journalier",icon:Ic.sun},
@@ -355,12 +407,12 @@ const TABS=[
     {id:"global",label:"Vue Globale",icon:Ic.globe},
     {id:"pnl",label:"P&L",icon:<svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>},
     {id:"tresorerie",label:"Trésorerie",icon:Ic.cash},
-    {id:"hotellerie",label:"Hôtelière",icon:Ic.htl},
     {id:"couts",label:"Coûts",icon:Ic.chrt},
     {id:"immobilier",label:"Immobilière",icon:Ic.bld},
     {id:"budget",label:"Budget 2026",icon:Ic.calc},
-    {id:"etablissements",label:"Carte",icon:Ic.map},
+    {id:"etablissements",label:"Établissements",icon:Ic.map},
     {id:"roadmap",label:"Roadmap",icon:Ic.clip},
+    {id:"rse",label:"RSE",icon:<svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064"/></svg>},
     {id:"organigramme",label:"Équipe",icon:Ic.usr}
 ];
 
@@ -525,6 +577,16 @@ const GlobalePage=()=>{
                     <span>Prévision annuelle : <strong className="text-gray-900">{fK(FC.tFC)}</strong></span>
                     <span>Ratio YTD/Budget : <strong className={(FC.ratio>=1?"text-green-600":"text-red-600")}>{fP(FC.ratio*100)}</strong></span>
                 </div>
+                <div className="mt-3 border-t pt-3">
+                    <div className="text-xs font-semibold text-gray-700 mb-2">Calendrier événementiel Grand Est</div>
+                    <div className="grid grid-cols-6 md:grid-cols-12 gap-1">
+                        {EVENTS.map(e=><div key={e.m} className={"rounded-lg p-1.5 text-center text-[9px] "+(e.impact>=10?"bg-green-100 text-green-800":e.impact>=5?"bg-blue-50 text-blue-700":e.impact>0?"bg-gray-50 text-gray-600":"bg-red-50 text-red-600")} title={e.nom}>
+                            <div className="font-bold">{MFR[e.m-1]}</div>
+                            <div className="truncate">{e.ico}</div>
+                            <div className="font-semibold">{e.impact>0?"+":""}{e.impact}%</div>
+                        </div>)}
+                    </div>
+                </div>
             </div>
             <div className="bg-white rounded-xl shadow-sm p-5">
                 <Sec>Segments (réel)</Sec>
@@ -652,47 +714,6 @@ const TresoreriePage=()=>{
             </div>
         </div>
         {minSol<1500&&<div className="p-3 bg-red-50 rounded-lg text-xs font-medium text-red-700 flex items-center gap-2">{Ic.wrn} Solde minimum à {fK(minSol)} — prévoir ligne de crédit court terme</div>}
-    </div>);
-};
-
-// ===== 5. HOTELLERIE PAGE =====
-const HotelierePage=()=>{
-    const [filtre,setFiltre]=useState("all");
-    const [tri,setTri]=useState("ca");
-    const enseignes=[...new Set(H.map(h=>h.ens))];
-    const filtered=filtre==="all"?H:H.filter(h=>h.ens===filtre);
-    const sorted=[...filtered].sort((a,b)=>tri==="ca"?b.ca-a.ca:tri==="to"?b.to-a.to:tri==="rp"?b.rp-a.rp:b.ch-a.ch);
-    const totalLab=H.reduce((s,h)=>s+h.lab.length,0);
-    return(<div className="slide-enter space-y-6">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <KPI label="Hôtels exploités" value={H.length} color="primary" icon={Ic.htl}/>
-            <KPI label="Chambres totales" value={fmt(H.reduce((s,h)=>s+h.ch,0))} color="secondary"/>
-            <KPI label="Labels RSE" value={totalLab} color="success"/>
-            <KPI label="Enseignes" value={enseignes.length} color="warning"/>
-        </div>
-        <div className="flex flex-wrap gap-2 items-center">
-            <span className="text-xs font-medium text-muted">Filtre :</span>
-            <button onClick={()=>setFiltre("all")} className={"px-3 py-1 rounded-full text-xs font-medium "+(filtre==="all"?"bg-primary text-white":"bg-gray-100 text-gray-600")}>Tous ({H.length})</button>
-            {enseignes.map(e=><button key={e} onClick={()=>setFiltre(e)} className={"px-3 py-1 rounded-full text-xs font-medium "+(filtre===e?"bg-primary text-white":"bg-gray-100 text-gray-600")}>{e} ({H.filter(h=>h.ens===e).length})</button>)}
-            <span className="ml-4 text-xs font-medium text-muted">Tri :</span>
-            {[["ca","CA"],["to","TO"],["rp","RevPAR"],["ch","Chambres"]].map(([k,l])=><button key={k} onClick={()=>setTri(k)} className={"px-2 py-1 rounded text-xs "+(tri===k?"bg-secondary text-white":"bg-gray-100 text-gray-600")}>{l}</button>)}
-        </div>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {sorted.map(h=><div key={h.id} className="hotel-card bg-white rounded-xl shadow-sm p-4 border-l-4" style={{borderLeftColor:h.e>=4?"#d4a853":h.e>=3?"#1e3a5f":h.e>=2?"#10b981":"#94a3b8"}}>
-                <div className="flex justify-between items-start mb-2">
-                    <div><h4 className="font-bold text-sm">{h.n}</h4><p className="text-xs text-muted">{h.v} · {"★".repeat(h.e)} · {h.fr}</p></div>
-                    <span className="text-xs bg-gray-100 px-2 py-0.5 rounded">{h.ch} ch.</span>
-                </div>
-                <div className="grid grid-cols-3 gap-2 text-xs text-center mb-2">
-                    <div className="bg-gray-50 rounded p-1.5"><span className="text-muted block">TO</span><span className="font-bold">{h.to}%</span></div>
-                    <div className="bg-gray-50 rounded p-1.5"><span className="text-muted block">ADR</span><span className="font-bold">{h.adr}€</span></div>
-                    <div className="bg-gray-50 rounded p-1.5"><span className="text-muted block">CA</span><span className="font-bold">{fK(h.ca)}</span></div>
-                </div>
-                <div className="text-xs text-muted"><span className="font-medium">RevPAR:</span> {h.rp}€ · <span className="font-medium">GOP:</span> {h.gp}%</div>
-                {h.lab.length>0&&<div className="flex flex-wrap gap-1 mt-2">{h.lab.map(l=><span key={l} className="text-[10px] px-1.5 py-0.5 bg-green-100 text-green-700 rounded-full">{l}</span>)}</div>}
-                <div className="text-[10px] text-muted mt-2">{h.prop} · {h.acq}</div>
-            </div>)}
-        </div>
     </div>);
 };
 
@@ -892,13 +913,20 @@ const BudgetPage=()=>{
     </div>);
 };
 
-// ===== 9. ETABLISSEMENTS PAGE (MAP) =====
+// ===== 9. ETABLISSEMENTS PAGE (PORTFOLIO) =====
 const EtablissementsPage=()=>{
-    const mRef=useRef(null);
-    const mInst=useRef(null);
+    const mRef=useRef(null);const mInst=useRef(null);
     const markersRef=useRef({hotels:[],nonExpl:[],pipeline:[],immo:[]});
     const [filtre,setFiltre]=useState("tous");
     const [panel,setPanel]=useState(null);
+    const [tri,setTri]=useState("ca");
+    const [ensF,setEnsF]=useState("all");
+    const enseignes=[...new Set(H.map(h=>h.ens))];
+
+    const filteredH=useMemo(()=>{
+        let list=[...H];if(ensF!=="all")list=list.filter(h=>h.ens===ensF);
+        return list.sort((a,b)=>tri==="ca"?b.ca-a.ca:tri==="to"?b.to-a.to:tri==="rp"?b.rp-a.rp:b.ch-a.ch);
+    },[ensF,tri]);
 
     const immGeo={"Forbach":[49.188,6.905],"Metz":[49.119,6.176],"Metz Amphithéâtre":[49.109,6.183],"Ars-Laquenexy":[49.078,6.285],"Jouy-aux-Arches":[49.065,6.078],"Manom":[49.348,6.159],"Sarreguemines":[49.110,7.069],"Châlons":[48.957,4.363],"Tassin":[45.764,4.762],"Castres":[43.605,2.242]};
 
@@ -907,18 +935,11 @@ const EtablissementsPage=()=>{
         const map=L.map(mRef.current).setView([48.5,5.5],7);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:''}).addTo(map);
         const mkIcon=(color,label)=>L.divIcon({className:'',html:'<div style="background:'+color+';color:white;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:bold;border:2px solid white;box-shadow:0 2px 8px rgba(0,0,0,.3);cursor:pointer">'+label+'</div>'});
-
         const mr=markersRef.current;
-        H.forEach(h=>{const m=L.marker([h.lat,h.lng],{icon:mkIcon('#1e3a5f',h.e+'★')}).addTo(map);
-            m.on('click',()=>setPanel({type:'hotel',data:h}));mr.hotels.push(m);});
-        H_NON_EXPL.forEach(h=>{const m=L.marker([h.lat,h.lng],{icon:mkIcon('#94a3b8','M')}).addTo(map);
-            m.on('click',()=>setPanel({type:'nonexpl',data:h}));mr.nonExpl.push(m);});
-        PIPELINE.forEach(h=>{const m=L.marker([h.lat,h.lng],{icon:mkIcon('#10b981','P')}).addTo(map);
-            m.on('click',()=>setPanel({type:'pipeline',data:h}));mr.pipeline.push(m);});
-        IMM.actifs.forEach((a,i)=>{const geo=immGeo[a.l];if(geo){
-            const m=L.marker([geo[0]+(i%5-2)*0.003,geo[1]+(Math.floor(i/5)-1)*0.004],{icon:mkIcon('#d4a853','I')}).addTo(map);
-            m.on('click',()=>setPanel({type:'immo',data:a}));mr.immo.push(m);}});
-
+        H.forEach(h=>{const m=L.marker([h.lat,h.lng],{icon:mkIcon('#1e3a5f',h.e+'★')}).addTo(map);m.on('click',()=>setPanel({type:'hotel',data:h}));mr.hotels.push(m);});
+        H_NON_EXPL.forEach(h=>{const m=L.marker([h.lat,h.lng],{icon:mkIcon('#94a3b8','M')}).addTo(map);m.on('click',()=>setPanel({type:'nonexpl',data:h}));mr.nonExpl.push(m);});
+        PIPELINE.forEach(h=>{const m=L.marker([h.lat,h.lng],{icon:mkIcon('#10b981','P')}).addTo(map);m.on('click',()=>setPanel({type:'pipeline',data:h}));mr.pipeline.push(m);});
+        IMM.actifs.forEach((a,i)=>{const geo=immGeo[a.l];if(geo){const m=L.marker([geo[0]+(i%5-2)*0.003,geo[1]+(Math.floor(i/5)-1)*0.004],{icon:mkIcon('#d4a853','I')}).addTo(map);m.on('click',()=>setPanel({type:'immo',data:a}));mr.immo.push(m);}});
         mInst.current=map;setTimeout(()=>map.invalidateSize(),200);
     },[]);
 
@@ -931,92 +952,93 @@ const EtablissementsPage=()=>{
         show(mr.immo,filtre==="tous"||filtre==="immo");
     },[filtre]);
 
-    const closePanel=()=>setPanel(null);
-
-    return(<div className="slide-enter space-y-4">
-        <div className="flex flex-wrap items-center gap-3">
-            <span className="text-xs font-medium text-muted">Afficher :</span>
+    return(<div className="slide-enter space-y-5">
+        <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-medium text-muted">Carte :</span>
             {[["tous","Tous"],["hotels","Hôtels"],["immo","Immobilier"]].map(([k,l])=>
-                <button key={k} onClick={()=>setFiltre(k)} className={"px-4 py-1.5 rounded-full text-xs font-semibold transition-colors "+(filtre===k?"bg-primary text-white shadow":"bg-gray-100 text-gray-600 hover:bg-gray-200")}>{l}</button>
-            )}
-            <div className="flex gap-3 ml-auto text-[11px] text-muted">
-                <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full inline-block" style={{background:'#1e3a5f'}}></span>Hôtels ({H.length})</span>
-                <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full inline-block" style={{background:'#94a3b8'}}></span>Non expl. ({H_NON_EXPL.length})</span>
-                <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full inline-block" style={{background:'#10b981'}}></span>Pipeline ({PIPELINE.length})</span>
-                <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full inline-block" style={{background:'#d4a853'}}></span>Immo ({IMM.actifs.length})</span>
+                <button key={k} onClick={()=>setFiltre(k)} className={"px-3 py-1 rounded-full text-xs font-semibold "+(filtre===k?"bg-primary text-white shadow":"bg-gray-100 text-gray-600")}>{l}</button>)}
+            <div className="flex gap-2 ml-auto text-[10px] text-muted">
+                <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full" style={{background:'#1e3a5f'}}></span>{H.length} hôtels</span>
+                <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full" style={{background:'#94a3b8'}}></span>{H_NON_EXPL.length} murs</span>
+                <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full" style={{background:'#10b981'}}></span>{PIPELINE.length} pipeline</span>
+                <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full" style={{background:'#d4a853'}}></span>{IMM.actifs.length} immo</span>
             </div>
         </div>
-        <div style={{position:'relative'}}>
-            <div ref={mRef} style={{height:"600px"}} className="rounded-xl shadow-sm border border-gray-200"></div>
+        <div ref={mRef} style={{height:"380px"}} className="rounded-xl shadow-sm border border-gray-200"></div>
+
+        <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-medium text-muted">Hôtels :</span>
+            <button onClick={()=>setEnsF("all")} className={"px-3 py-1 rounded-full text-xs font-medium "+(ensF==="all"?"bg-secondary text-white":"bg-gray-100 text-gray-600")}>Tous ({H.length})</button>
+            {enseignes.map(e=><button key={e} onClick={()=>setEnsF(e)} className={"px-3 py-1 rounded-full text-xs font-medium "+(ensF===e?"bg-secondary text-white":"bg-gray-100 text-gray-600")}>{e} ({H.filter(h=>h.ens===e).length})</button>)}
+            <div className="ml-auto flex gap-1">
+                {[["ca","CA"],["to","TO"],["rp","RevPAR"],["ch","Ch."]].map(([k,l])=><button key={k} onClick={()=>setTri(k)} className={"px-2 py-1 rounded text-[11px] "+(tri===k?"bg-primary text-white":"bg-gray-100 text-gray-600")}>{l}</button>)}
+            </div>
         </div>
 
-        <div className={"side-overlay"+(panel?" open":"")} onClick={closePanel}></div>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+            {filteredH.map(h=><div key={h.id} onClick={()=>setPanel({type:'hotel',data:h})} className="hotel-card bg-white rounded-xl shadow-sm p-3 border-l-4 cursor-pointer" style={{borderLeftColor:h.e>=4?"#d4a853":h.e>=3?"#1e3a5f":h.e>=2?"#10b981":"#94a3b8"}}>
+                <h4 className="font-bold text-xs truncate">{h.n}</h4>
+                <p className="text-[10px] text-muted">{h.v} · {"★".repeat(h.e)} · {h.ch} ch.</p>
+                <div className="grid grid-cols-3 gap-1 mt-2 text-[10px] text-center">
+                    <div className="bg-gray-50 rounded p-1"><span className="text-muted block">TO</span><span className="font-bold">{h.to}%</span></div>
+                    <div className="bg-gray-50 rounded p-1"><span className="text-muted block">ADR</span><span className="font-bold">{h.adr}€</span></div>
+                    <div className="bg-gray-50 rounded p-1"><span className="text-muted block">CA</span><span className="font-bold">{fK(h.ca)}</span></div>
+                </div>
+                {h.lab.length>0&&<div className="flex gap-0.5 mt-1.5">{h.lab.map(l=><span key={l} className="text-[8px] px-1 py-0.5 bg-green-100 text-green-700 rounded-full">{l}</span>)}</div>}
+            </div>)}
+        </div>
+
+        <div className={"side-overlay"+(panel?" open":"")} onClick={()=>setPanel(null)}></div>
         <div className={"side-panel"+(panel?" open":"")}>
             {panel&&<div className="p-6">
-                <button onClick={closePanel} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 text-lg font-bold">×</button>
-
+                <button onClick={()=>setPanel(null)} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 text-lg font-bold">×</button>
                 {panel.type==="hotel"&&<div>
-                    <div className="mb-4">
-                        <span className="text-xs text-muted">{panel.data.ens} · {panel.data.fr}</span>
-                        <h2 className="text-lg font-bold text-primary mt-1">{panel.data.n}</h2>
-                        <p className="text-sm text-muted">{panel.data.v} · {"★".repeat(panel.data.e)}</p>
+                    <span className="text-xs text-muted">{panel.data.ens} · {panel.data.fr}</span>
+                    <h2 className="text-lg font-bold text-primary mt-1">{panel.data.n}</h2>
+                    <p className="text-sm text-muted">{panel.data.v} · {"★".repeat(panel.data.e)}</p>
+                    <div className="grid grid-cols-3 gap-3 my-4">
+                        <div className="bg-blue-50 rounded-lg p-3 text-center"><div className="text-[10px] text-muted">Chambres</div><div className="text-lg font-bold text-primary">{panel.data.ch}</div></div>
+                        <div className="bg-green-50 rounded-lg p-3 text-center"><div className="text-[10px] text-muted">TO</div><div className="text-lg font-bold text-green-600">{panel.data.to}%</div></div>
+                        <div className="bg-yellow-50 rounded-lg p-3 text-center"><div className="text-[10px] text-muted">CA</div><div className="text-lg font-bold text-yellow-700">{fK(panel.data.ca)}</div></div>
                     </div>
-                    <div className="grid grid-cols-3 gap-3 mb-4">
-                        <div className="bg-blue-50 rounded-lg p-3 text-center"><div className="text-xs text-muted">Chambres</div><div className="text-lg font-bold text-primary">{panel.data.ch}</div></div>
-                        <div className="bg-green-50 rounded-lg p-3 text-center"><div className="text-xs text-muted">TO</div><div className="text-lg font-bold text-green-600">{panel.data.to}%</div></div>
-                        <div className="bg-yellow-50 rounded-lg p-3 text-center"><div className="text-xs text-muted">CA</div><div className="text-lg font-bold text-yellow-700">{fK(panel.data.ca)}</div></div>
+                    <div className="space-y-1.5 text-xs border-t pt-3">
+                        {[["ADR",panel.data.adr+" €"],["RevPAR",panel.data.rp+" €"],["GOP",panel.data.gp+"%"],["Coût/nuit",panel.data.cc+" €"]].map(([k,v])=><div key={k} className="flex justify-between"><span className="text-muted">{k}</span><span className="font-semibold">{v}</span></div>)}
                     </div>
-                    <div className="space-y-2 text-xs border-t pt-3">
-                        <div className="flex justify-between"><span className="text-muted">ADR</span><span className="font-semibold">{panel.data.adr} €</span></div>
-                        <div className="flex justify-between"><span className="text-muted">RevPAR</span><span className="font-semibold">{panel.data.rp} €</span></div>
-                        <div className="flex justify-between"><span className="text-muted">GOP</span><span className="font-semibold">{panel.data.gp}%</span></div>
-                        <div className="flex justify-between"><span className="text-muted">Coût complet / nuit</span><span className="font-semibold">{panel.data.cc} €</span></div>
-                    </div>
-                    <div className="space-y-2 text-xs border-t pt-3 mt-3">
-                        <div className="flex justify-between"><span className="text-muted">Propriété</span><span className="font-semibold">{panel.data.prop}</span></div>
-                        <div className="flex justify-between"><span className="text-muted">Acquisition</span><span className="font-semibold">{panel.data.acq}</span></div>
+                    <div className="space-y-1.5 text-xs border-t pt-3 mt-3">
+                        {[["Propriété",panel.data.prop],["Acquisition",panel.data.acq]].map(([k,v])=><div key={k} className="flex justify-between"><span className="text-muted">{k}</span><span className="font-semibold">{v}</span></div>)}
                         {panel.data.reno!=="—"&&<div className="flex justify-between"><span className="text-muted">Rénovation</span><span className="font-semibold">{panel.data.reno}</span></div>}
                     </div>
-                    <div className="space-y-2 text-xs border-t pt-3 mt-3">
+                    <div className="space-y-1.5 text-xs border-t pt-3 mt-3">
                         <div className="flex justify-between"><span className="text-muted">Directeur</span><span className="font-bold">{panel.data.dir}</span></div>
                         <div className="flex justify-between"><span className="text-muted">Téléphone</span><span className="font-semibold">{panel.data.tel}</span></div>
                     </div>
                     {panel.data.lab.length>0&&<div className="mt-3 pt-3 border-t"><span className="text-xs text-muted block mb-1">Labels RSE</span><div className="flex flex-wrap gap-1">{panel.data.lab.map(l=><span key={l} className="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded-full">{l}</span>)}</div></div>}
                     <div className="mt-3 pt-3 border-t"><span className="text-xs text-muted block mb-1">Équipements</span><div className="flex flex-wrap gap-1">{panel.data.eq.map(e=><span key={e} className="text-xs px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full">{e}</span>)}</div></div>
                 </div>}
-
                 {panel.type==="immo"&&<div>
                     <span className="text-xs text-muted">Actif immobilier</span>
                     <h2 className="text-lg font-bold text-secondary mt-1">{panel.data.t}</h2>
                     <p className="text-sm text-muted mb-4">{panel.data.l}</p>
                     <div className="space-y-2 text-xs">
                         {panel.data.s>0&&<div className="flex justify-between p-2 bg-gray-50 rounded"><span className="text-muted">Surface</span><span className="font-semibold">{fmt(panel.data.s)} m²</span></div>}
-                        <div className="flex justify-between p-2 bg-gray-50 rounded"><span className="text-muted">Locataire / Usage</span><span className="font-semibold text-right max-w-[200px]">{panel.data.loc}</span></div>
+                        <div className="flex justify-between p-2 bg-gray-50 rounded"><span className="text-muted">Locataire</span><span className="font-semibold text-right max-w-[200px]">{panel.data.loc}</span></div>
                         <div className="flex justify-between p-2 bg-gray-50 rounded"><span className="text-muted">Acquisition</span><span className="font-semibold">{panel.data.a}</span></div>
                     </div>
                 </div>}
-
                 {panel.type==="nonexpl"&&<div>
                     <span className="text-xs text-muted">Murs non exploités</span>
                     <h2 className="text-lg font-bold mt-1">{panel.data.n}</h2>
                     <p className="text-sm text-muted mb-4">{panel.data.v}</p>
                     <div className="space-y-2 text-xs">
-                        <div className="flex justify-between p-2 bg-gray-50 rounded"><span className="text-muted">Chambres</span><span className="font-semibold">{panel.data.ch}</span></div>
-                        <div className="flex justify-between p-2 bg-gray-50 rounded"><span className="text-muted">Propriété</span><span className="font-semibold">{panel.data.prop}</span></div>
-                        <div className="flex justify-between p-2 bg-gray-50 rounded"><span className="text-muted">Livraison</span><span className="font-semibold">{panel.data.liv}</span></div>
-                        <div className="flex justify-between p-2 bg-gray-50 rounded"><span className="text-muted">Exploitant</span><span className="font-semibold">{panel.data.expl}</span></div>
-                        {panel.data.surf&&<div className="flex justify-between p-2 bg-gray-50 rounded"><span className="text-muted">Surface</span><span className="font-semibold">{fmt(panel.data.surf)} m²</span></div>}
+                        {[["Chambres",panel.data.ch],["Propriété",panel.data.prop],["Livraison",panel.data.liv],["Exploitant",panel.data.expl]].map(([k,v])=><div key={k} className="flex justify-between p-2 bg-gray-50 rounded"><span className="text-muted">{k}</span><span className="font-semibold">{v}</span></div>)}
                     </div>
                 </div>}
-
                 {panel.type==="pipeline"&&<div>
-                    <span className="text-xs text-muted">Projet en pipeline</span>
+                    <span className="text-xs text-muted">Projet pipeline</span>
                     <h2 className="text-lg font-bold text-green-700 mt-1">{panel.data.n}</h2>
                     <p className="text-sm text-muted mb-4">{panel.data.v}</p>
                     <div className="space-y-2 text-xs">
-                        <div className="flex justify-between p-2 bg-gray-50 rounded"><span className="text-muted">Chambres prévues</span><span className="font-semibold">{panel.data.ch}</span></div>
-                        <div className="flex justify-between p-2 bg-gray-50 rounded"><span className="text-muted">Statut</span><span className="font-semibold">{panel.data.stat}</span></div>
-                        <div className="flex justify-between p-2 bg-gray-50 rounded"><span className="text-muted">Échéance</span><span className="font-semibold">{panel.data.ech}</span></div>
+                        {[["Chambres",panel.data.ch],["Statut",panel.data.stat],["Échéance",panel.data.ech]].map(([k,v])=><div key={k} className="flex justify-between p-2 bg-gray-50 rounded"><span className="text-muted">{k}</span><span className="font-semibold">{v}</span></div>)}
                         <div className="flex justify-between p-2 bg-green-50 rounded"><span className="text-muted">CA prévisionnel</span><span className="font-bold text-green-700">{fK(panel.data.caP)}</span></div>
                     </div>
                 </div>}
@@ -1195,12 +1217,123 @@ const PnlPage=()=>{
     </div>);
 };
 
+// ===== 12. RSE PAGE =====
+const RsePage=()=>{
+    const R=RSE_DATA;
+    const scopeData=R.carbone.scopes.map(s=>({name:s.l.split("—")[0].trim(),value:s.v,color:s.c}));
+    const stColors={"Fait":"#10b981","En cours":"#3b82f6","Planifié":"#f59e0b","Étude":"#94a3b8"};
+    return(<div className="slide-enter space-y-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <KPI label="Émissions CO₂" value={fmt(R.carbone.total)+" tCO₂e"} color="danger" trend={-3.4} tl="% vs N-1"/>
+            <KPI label="Énergie" value={fmt(R.energie.conso)+" MWh"} color="warning" trend={-2.4} tl="%"/>
+            <KPI label="Eau" value={R.eau.parNuitee+" L/nuitée"} color="primary"/>
+            <KPI label="Taux de tri" value={R.dechets.tri+"%"} color="success" trend={4} tl=" pts"/>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-6">
+            <div className="bg-white rounded-xl shadow-sm p-5">
+                <Sec>Bilan Carbone — {fmt(R.carbone.total)} tCO₂e/an</Sec>
+                <ResponsiveContainer width="100%" height={220}>
+                    <PieChart><Pie data={scopeData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={50} outerRadius={80} label={({name,value})=>name+" "+fmt(value)} labelLine={false} fontSize={9}>
+                    {scopeData.map((d,i)=><Cell key={i} fill={d.color}/>)}</Pie><Tooltip/></PieChart>
+                </ResponsiveContainer>
+                <div className="space-y-2 mt-3">{R.carbone.scopes.map(s=><div key={s.l} className="text-xs">
+                    <div className="flex justify-between font-medium mb-0.5"><span style={{color:s.c}}>{s.l}</span><span>{fmt(s.v)} tCO₂e</span></div>
+                    <div className="flex flex-wrap gap-1">{s.detail.map(d=><span key={d.l} className="px-1.5 py-0.5 bg-gray-100 rounded text-[10px]">{d.l}: {fmt(d.v)}</span>)}</div>
+                </div>)}</div>
+            </div>
+            <div className="bg-white rounded-xl shadow-sm p-5">
+                <Sec>Trajectoire carbone (tCO₂e)</Sec>
+                <ResponsiveContainer width="100%" height={220}>
+                    <ComposedChart data={R.carbone.evo}><CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0"/>
+                    <XAxis dataKey="a" tick={{fontSize:10}} stroke="#94a3b8"/>
+                    <YAxis tick={{fontSize:10}} stroke="#94a3b8" domain={[3000,5500]}/>
+                    <Tooltip/><ReferenceLine y={R.carbone.objectif2030} stroke="#10b981" strokeDasharray="5 5" label={{value:"Objectif 2030 (−20%)",fontSize:10,fill:"#10b981"}}/>
+                    <Bar dataKey="v" name="Émissions" radius={[4,4,0,0]}>
+                    {R.carbone.evo.map((d,i)=><Cell key={i} fill={d.a.includes("Obj")||d.a.includes("P")?"rgba(30,58,95,0.4)":"#1e3a5f"}/>)}</Bar>
+                    <Line type="monotone" dataKey="v" stroke="#d4a853" strokeWidth={2} dot={{r:3}}/>
+                    </ComposedChart>
+                </ResponsiveContainer>
+                <div className="mt-3 p-2 bg-green-50 rounded-lg text-xs text-green-700">
+                    <strong>{R.carbone.parChambre} tCO₂e/chambre</strong> vs benchmark secteur <strong>{R.carbone.benchmark}</strong> — <span className="text-green-600 font-bold">−{Math.round((1-R.carbone.parChambre/R.carbone.benchmark)*100)}% sous le benchmark</span>
+                </div>
+            </div>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-4">
+            <div className="bg-white rounded-xl shadow-sm p-4">
+                <Sec>Énergie — {R.energie.kwh_m2} kWh/m²</Sec>
+                <ResponsiveContainer width="100%" height={160}>
+                    <PieChart><Pie data={R.energie.parType} dataKey="v" nameKey="l" cx="50%" cy="50%" outerRadius={60} label={({l,v})=>l+" "+fmt(v)} labelLine={false} fontSize={9}>
+                    {R.energie.parType.map((d,i)=><Cell key={i} fill={d.c}/>)}</Pie><Tooltip/></PieChart>
+                </ResponsiveContainer>
+                <div className="mt-2"><div className="flex justify-between text-xs mb-1"><span className="text-muted">vs benchmark ({R.energie.benchmark} kWh/m²)</span><span className="font-bold text-green-600">−{Math.round((1-R.energie.kwh_m2/R.energie.benchmark)*100)}%</span></div>
+                <div className="w-full bg-gray-200 rounded-full h-2"><div className="bg-green-500 h-2 rounded-full" style={{width:Math.round(R.energie.kwh_m2/R.energie.benchmark*100)+"%"}}></div></div></div>
+            </div>
+            <div className="bg-white rounded-xl shadow-sm p-4">
+                <Sec>Eau — {R.eau.parNuitee} L/nuitée</Sec>
+                <div className="flex items-center justify-center my-4">
+                    <div className="relative w-28 h-28 rounded-full border-8 border-blue-200 flex items-center justify-center">
+                        <div className="text-center"><div className="text-2xl font-bold text-primary">{R.eau.parNuitee}</div><div className="text-[10px] text-muted">L/nuitée</div></div>
+                        <div className="absolute -bottom-2 text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">Bench. {R.eau.benchmark}L</div>
+                    </div>
+                </div>
+                <div className="text-xs text-center text-muted">Total annuel : <strong>{fmt(R.eau.total)} m³</strong><br/>Objectif : {R.eau.objectif} L/nuitée</div>
+            </div>
+            <div className="bg-white rounded-xl shadow-sm p-4">
+                <Sec>Déchets — {R.dechets.tri}% triés</Sec>
+                <ResponsiveContainer width="100%" height={160}>
+                    <PieChart><Pie data={R.dechets.parType} dataKey="v" nameKey="l" cx="50%" cy="50%" outerRadius={60} label={({l,v})=>l+" "+v+"%"} labelLine={false} fontSize={8}>
+                    {R.dechets.parType.map((d,i)=><Cell key={i} fill={d.c}/>)}</Pie><Tooltip/></PieChart>
+                </ResponsiveContainer>
+                <div className="mt-2"><div className="flex justify-between text-xs mb-1"><span className="text-muted">Taux de tri</span><span className="font-bold">{R.dechets.tri}% / obj. {R.dechets.objectifTri}%</span></div>
+                <div className="w-full bg-gray-200 rounded-full h-2"><div className="bg-green-500 h-2 rounded-full" style={{width:R.dechets.tri+"%"}}></div></div></div>
+            </div>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-sm p-5">
+            <Sec>Labels & Certifications</Sec>
+            <div className="grid md:grid-cols-3 gap-4">
+                {R.labels.map(l=><div key={l.l} className="p-3 border rounded-xl">
+                    <div className="flex items-center justify-between mb-2">
+                        <span className="font-bold text-sm" style={{color:l.c}}>{l.l}</span>
+                        <span className="text-xs bg-gray-100 px-2 py-0.5 rounded-full">{l.n}/{l.total} sites</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-3 mb-1">
+                        <div className="h-3 rounded-full progress-bar" style={{width:(l.n/l.total*100)+"%",background:l.c}}></div>
+                    </div>
+                    {l.obj&&<div className="text-[10px] text-muted mt-1">Objectif : {l.obj}</div>}
+                </div>)}
+            </div>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-sm p-5">
+            <Sec right={<XBtn onClick={()=>xls(R.actions.map(a=>({Action:a.l,Statut:a.st,Progression:a.prg+"%",Categorie:a.cat,Impact:a.eco})),"rse_actions")} label="Export"/>}>Plan d'actions RSE ({R.actions.length})</Sec>
+            <div className="space-y-3">
+                {R.actions.map(a=><div key={a.l} className="flex items-center gap-3">
+                    <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-0.5">
+                            <span className="text-xs font-medium truncate">{a.l}</span>
+                            <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium flex-shrink-0" style={{background:stColors[a.st]+"20",color:stColors[a.st]}}>{a.st}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <div className="flex-1 bg-gray-200 rounded-full h-2"><div className="h-2 rounded-full progress-bar" style={{width:a.prg+"%",background:stColors[a.st]}}></div></div>
+                            <span className="text-[10px] font-bold w-8 text-right">{a.prg}%</span>
+                        </div>
+                    </div>
+                    <span className="text-[10px] text-muted w-24 text-right flex-shrink-0">{a.eco}</span>
+                </div>)}
+            </div>
+        </div>
+    </div>);
+};
+
 // ===== APP COMPONENT =====
 const App=()=>{
     const [tab,setTab]=useState("daily");
     const totalCH=H.reduce((s,h)=>s+h.ch,0);
     const totalCA=H.reduce((s,h)=>s+h.ca,0);
-    const pages={daily:DailyPage,groupe:GroupePage,global:GlobalePage,pnl:PnlPage,tresorerie:TresoreriePage,hotellerie:HotelierePage,couts:CoutsPage,immobilier:ImmobilierePage,budget:BudgetPage,etablissements:EtablissementsPage,roadmap:RoadmapPage,organigramme:OrganigrammePage};
+    const pages={daily:DailyPage,groupe:GroupePage,global:GlobalePage,pnl:PnlPage,tresorerie:TresoreriePage,couts:CoutsPage,immobilier:ImmobilierePage,budget:BudgetPage,etablissements:EtablissementsPage,roadmap:RoadmapPage,rse:RsePage,organigramme:OrganigrammePage};
     const Page=pages[tab]||DailyPage;
     return(
     <div className="min-h-screen bg-gray-50">
