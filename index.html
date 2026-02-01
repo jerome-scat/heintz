@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heintz Immobilier & Hôtellerie - Dashboard Contrôle de Gestion</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/recharts@2.10.4/umd/Recharts.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        heintz: {
+                            navy: '#1e2a4a',
+                            gold: '#c9a962',
+                            blue: '#2d4a7c',
+                            light: '#f5f5f0',
+                            gray: '#8b8b8b',
+                            green: '#2d7c4a',
+                            red: '#c94a4a',
+                            orange: '#c97a2d'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['DM Sans', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: #f5f5f0;
+        }
+        .gradient-header {
+            background: linear-gradient(135deg, #1e2a4a 0%, #2d4a7c 100%);
+        }
+        .card-shadow {
+            box-shadow: 0 4px 20px rgba(30, 42, 74, 0.08);
+        }
+        .kpi-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(30, 42, 74, 0.12);
+        }
+        .nav-item {
+            position: relative;
+        }
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #c9a962;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-300 { animation-delay: 0.3s; }
+        .delay-400 { animation-delay: 0.4s; }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f5f5f0;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c9a962;
+            border-radius: 3px;
+        }
+        
+        .table-row:hover {
+            background: rgba(201, 169, 98, 0.05);
+        }
+        
+        .budget-positive {
+            color: #2d7c4a;
+            background: rgba(45, 124, 74, 0.1);
+        }
+        .budget-negative {
+            color: #c94a4a;
+            background: rgba(201, 74, 74, 0.1);
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, #1e2a4a 0%, #2d4a7c 100%);
+        }
+        
+        .tooltip-custom {
+            background: #1e2a4a !important;
+            border: none !important;
+            border-radius: 8px !important;
+            padding: 12px 16px !important;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { 
+            LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
+            XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
+            ComposedChart, ReferenceLine
+        } = Recharts;
+
+        // ============================================
+        // DATA - Données fictives mais réalistes
+        // ============================================
+        
+        const HOTELS_DATA = [
+            { id: 1, name: "Ibis Styles", city: "Châlons-en-Champagne", stars: 3, rooms: 70, segment: "Milieu de gamme", brand: "Accor" },
+            { id: 2, name: "Ibis Budget", city: "Forbach", stars: 2, rooms: 71, segment: "Économique", brand: "Accor" },
+            { id: 3, name: "B&B", city: "Thionville", stars: 3, rooms: 76, segment: "Milieu de gamme", brand: "B&B Hotels" },
+            { id: 4, name: "Ibis Styles", city: "Sarrebourg", stars: 3, rooms: 48, segment: "Milieu de gamme", brand: "Accor" },
+            { id: 5, name: "Première Classe", city: "Jouy-aux-Arches", stars: 1, rooms: 71, segment: "Super économique", brand: "Louvre Hotels" },
+            { id: 6, name: "Ibis Budget", city: "Metz", stars: 2, rooms: 82, segment: "Économique", brand: "Accor" },
+            { id: 7, name: "Mercure", city: "Metz", stars: 4, rooms: 112, segment: "Haut de gamme", brand: "Accor" },
+            { id: 8, name: "Ibis Budget", city: "Sarrebourg", stars: 2, rooms: 61, segment: "Économique", brand: "Accor" },
+            { id: 9, name: "Première Classe", city: "Freyming-Merlebach", stars: 1, rooms: 71, segment: "Super économique", brand: "Louvre Hotels" },
+            { id: 10, name: "Campanile", city: "Jouy-aux-Arches", stars: 3, rooms: 59, segment: "Milieu de gamme", brand: "Louvre Hotels" },
+            { id: 11, name: "Ibis", city: "Châlons-en-Champagne", stars: 3, rooms: 43, segment: "Milieu de gamme", brand: "Accor" },
+            { id: 12, name: "Campanile", city: "Metz", stars: 3, rooms: 75, segment: "Milieu de gamme", brand: "Louvre Hotels" },
+            { id: 13, name: "Ibis", city: "Metz", stars: 3, rooms: 79, segment: "Milieu de gamme", brand: "Accor" },
+            { id: 14, name: "Ibis Styles", city: "Metz", stars: 3, rooms: 86, segment: "Milieu de gamme", brand: "Accor" }
+        ];
+
+        // Performance par hôtel et par année
+        const HOTEL_PERFORMANCE = {
+            2023: [
+                { id: 1, ca: 2050, budget: 2100, to: 68.2, revpar: 72.5, adr: 106.3, gop: 410, gopMargin: 20.0 },
+                { id: 2, ca: 620, budget: 650, to: 62.5, revpar: 22.8, adr: 36.5, gop: 93, gopMargin: 15.0 },
+                { id: 3, ca: 1320, budget: 1400, to: 65.8, revpar: 45.2, adr: 68.7, gop: 224, gopMargin: 17.0 },
+                { id: 4, ca: 980, budget: 1000, to: 61.2, revpar: 52.1, adr: 85.1, gop: 176, gopMargin: 18.0 },
+                { id: 5, ca: 540, budget: 580, to: 58.4, revpar: 19.8, adr: 33.9, gop: 65, gopMargin: 12.0 },
+                { id: 6, ca: 1150, budget: 1200, to: 64.8, revpar: 36.5, adr: 56.3, gop: 184, gopMargin: 16.0 },
+                { id: 7, ca: 4200, budget: 4300, to: 72.5, revpar: 98.2, adr: 135.4, gop: 1050, gopMargin: 25.0 },
+                { id: 8, ca: 750, budget: 800, to: 60.2, revpar: 32.1, adr: 53.3, gop: 113, gopMargin: 15.0 },
+                { id: 9, ca: 420, budget: 450, to: 55.8, revpar: 15.4, adr: 27.6, gop: 42, gopMargin: 10.0 },
+                { id: 10, ca: 880, budget: 920, to: 63.2, revpar: 38.9, adr: 61.5, gop: 141, gopMargin: 16.0 },
+                { id: 11, ca: 1050, budget: 1100, to: 67.5, revpar: 63.8, adr: 94.5, gop: 189, gopMargin: 18.0 },
+                { id: 12, ca: 1520, budget: 1600, to: 66.8, revpar: 52.8, adr: 79.0, gop: 274, gopMargin: 18.0 },
+                { id: 13, ca: 1720, budget: 1800, to: 68.2, revpar: 56.8, adr: 83.3, gop: 310, gopMargin: 18.0 },
+                { id: 14, ca: 2180, budget: 2200, to: 70.5, revpar: 66.2, adr: 93.9, gop: 436, gopMargin: 20.0 }
+            ],
+            2024: [
+                { id: 1, ca: 2180, budget: 2200, to: 70.5, revpar: 76.8, adr: 108.9, gop: 458, gopMargin: 21.0 },
+                { id: 2, ca: 680, budget: 700, to: 65.2, revpar: 25.0, adr: 38.3, gop: 109, gopMargin: 16.0 },
+                { id: 3, ca: 1420, budget: 1450, to: 68.5, revpar: 48.6, adr: 70.9, gop: 256, gopMargin: 18.0 },
+                { id: 4, ca: 1020, budget: 1050, to: 64.8, revpar: 54.2, adr: 83.6, gop: 194, gopMargin: 19.0 },
+                { id: 5, ca: 590, budget: 600, to: 61.2, revpar: 21.6, adr: 35.3, gop: 77, gopMargin: 13.0 },
+                { id: 6, ca: 1250, budget: 1280, to: 67.5, revpar: 39.7, adr: 58.8, gop: 213, gopMargin: 17.0 },
+                { id: 7, ca: 4450, budget: 4500, to: 74.8, revpar: 103.8, adr: 138.8, gop: 1157, gopMargin: 26.0 },
+                { id: 8, ca: 810, budget: 830, to: 63.5, revpar: 34.6, adr: 54.5, gop: 130, gopMargin: 16.0 },
+                { id: 9, ca: 460, budget: 480, to: 58.2, revpar: 16.9, adr: 29.0, gop: 51, gopMargin: 11.0 },
+                { id: 10, ca: 950, budget: 980, to: 66.8, revpar: 42.0, adr: 62.9, gop: 162, gopMargin: 17.0 },
+                { id: 11, ca: 1120, budget: 1150, to: 70.2, revpar: 68.1, adr: 97.0, gop: 213, gopMargin: 19.0 },
+                { id: 12, ca: 1620, budget: 1650, to: 69.5, revpar: 56.3, adr: 81.0, gop: 308, gopMargin: 19.0 },
+                { id: 13, ca: 1820, budget: 1850, to: 71.2, revpar: 60.1, adr: 84.4, gop: 346, gopMargin: 19.0 },
+                { id: 14, ca: 2320, budget: 2350, to: 73.2, revpar: 70.4, adr: 96.2, gop: 487, gopMargin: 21.0 }
+            ],
+            2025: [
+                { id: 1, ca: 2250, budget: 2300, to: 72.8, revpar: 79.2, adr: 108.8, gop: 495, gopMargin: 22.0 },
+                { id: 2, ca: 700, budget: 720, to: 66.8, revpar: 25.7, adr: 38.5, gop: 119, gopMargin: 17.0 },
+                { id: 3, ca: 1500, budget: 1520, to: 70.2, revpar: 51.4, adr: 73.2, gop: 285, gopMargin: 19.0 },
+                { id: 4, ca: 1080, budget: 1100, to: 67.5, revpar: 57.4, adr: 85.0, gop: 216, gopMargin: 20.0 },
+                { id: 5, ca: 620, budget: 640, to: 63.5, revpar: 22.8, adr: 35.9, gop: 87, gopMargin: 14.0 },
+                { id: 6, ca: 1300, budget: 1350, to: 69.2, revpar: 41.3, adr: 59.7, gop: 234, gopMargin: 18.0 },
+                { id: 7, ca: 4600, budget: 4650, to: 76.5, revpar: 107.3, adr: 140.3, gop: 1242, gopMargin: 27.0 },
+                { id: 8, ca: 850, budget: 870, to: 65.8, revpar: 36.4, adr: 55.3, gop: 145, gopMargin: 17.0 },
+                { id: 9, ca: 490, budget: 510, to: 60.5, revpar: 18.0, adr: 29.8, gop: 59, gopMargin: 12.0 },
+                { id: 10, ca: 1000, budget: 1020, to: 68.5, revpar: 44.2, adr: 64.5, gop: 180, gopMargin: 18.0 },
+                { id: 11, ca: 1170, budget: 1200, to: 72.5, revpar: 71.1, adr: 98.1, gop: 234, gopMargin: 20.0 },
+                { id: 12, ca: 1680, budget: 1720, to: 71.8, revpar: 58.4, adr: 81.3, gop: 336, gopMargin: 20.0 },
+                { id: 13, ca: 1900, budget: 1950, to: 73.5, revpar: 62.8, adr: 85.4, gop: 380, gopMargin: 20.0 },
+                { id: 14, ca: 2400, budget: 2450, to: 75.2, revpar: 72.8, adr: 96.8, gop: 528, gopMargin: 22.0 }
+            ],
+            2026: [
+                { id: 1, ca: null, budget: 2400, to: null, revpar: null, adr: null, gop: null, gopMargin: null },
+                { id: 2, ca: null, budget: 750, to: null, revpar: null, adr: null, gop: null, gopMargin: null },
+                { id: 3, ca: null, budget: 1580, to: null, revpar: null, adr: null, gop: null, gopMargin: null },
+                { id: 4, ca: null, budget: 1150, to: null, revpar: null, adr: null, gop: null, gopMargin: null },
+                { id: 5, ca: null, budget: 680, to: null, revpar: null, adr: null, gop: null, gopMargin: null },
+                { id: 6, ca: null, budget: 1400, to: null, revpar: null, adr: null, gop: null, gopMargin: null },
+                { id: 7, ca: null, budget: 4800, to: null, revpar: null, adr: null, gop: null, gopMargin: null },
+                { id: 8, ca: null, budget: 900, to: null, revpar: null, adr: null, gop: null, gopMargin: null },
+                { id: 9, ca: null, budget: 540, to: null, revpar: null, adr: null, gop: null, gopMargin: null },
+                { id: 10, ca: null, budget: 1080, to: null, revpar: null, adr: null, gop: null, gopMargin: null },
+                { id: 11, ca: null, budget: 1250, to: null, revpar: null, adr: null, gop: null, gopMargin: null },
+                { id: 12, ca: null, budget: 1800, to: null, revpar: null, adr: null, gop: null, gopMargin: null },
+                { id: 13, ca: null, budget: 2050, to: null, revpar: null, adr: null, gop: null, gopMargin: null },
+                { id: 14, ca: null, budget: 2550, to: null, revpar: null, adr: null, gop: null, gopMargin: null }
+            ]
+        };
+
+        // Données mensuelles 2025 pour le suivi budget
+        const MONTHLY_DATA_2025 = [
+            { month: "Jan", realise: 1420, budget: 1580, ecart: -160, cumul_realise: 1420, cumul_budget: 1580 },
+            { month: "Fév", realise: 1380, budget: 1520, ecart: -140, cumul_realise: 2800, cumul_budget: 3100 },
+            { month: "Mar", realise: 1680, budget: 1650, ecart: 30, cumul_realise: 4480, cumul_budget: 4750 },
+            { month: "Avr", realise: 1850, budget: 1780, ecart: 70, cumul_realise: 6330, cumul_budget: 6530 },
+            { month: "Mai", realise: 2120, budget: 1950, ecart: 170, cumul_realise: 8450, cumul_budget: 8480 },
+            { month: "Juin", realise: 2280, budget: 2100, ecart: 180, cumul_realise: 10730, cumul_budget: 10580 },
+            { month: "Juil", realise: 2450, budget: 2350, ecart: 100, cumul_realise: 13180, cumul_budget: 12930 },
+            { month: "Août", realise: 2380, budget: 2280, ecart: 100, cumul_realise: 15560, cumul_budget: 15210 },
+            { month: "Sep", realise: 1980, budget: 1920, ecart: 60, cumul_realise: 17540, cumul_budget: 17130 },
+            { month: "Oct", realise: 1850, budget: 1800, ecart: 50, cumul_realise: 19390, cumul_budget: 18930 },
+            { month: "Nov", realise: null, budget: 1650, ecart: null, cumul_realise: null, cumul_budget: 20580 },
+            { month: "Déc", realise: null, budget: 1950, ecart: null, cumul_realise: null, cumul_budget: 22530 }
+        ];
+
+        // Données immobilier
+        const IMMOBILIER_DATA = {
+            surface: 22496,
+            valeur: 41.4,
+            loyersBruts: 3.4,
+            loyersNets: 3.2,
+            tauxCapitalisation: 7.3,
+            ltv: 37,
+            dscr: 149,
+            dettes: 15.3,
+            remboursementAnnuel: 2.1,
+            actifs: [
+                { type: "Bureaux", pourcentage: 38, valeur: 15.7 },
+                { type: "Hôtels", pourcentage: 28, valeur: 11.6 },
+                { type: "Commerce", pourcentage: 11, valeur: 4.6 },
+                { type: "Autre", pourcentage: 10, valeur: 4.1 },
+                { type: "Logement", pourcentage: 7, valeur: 2.9 },
+                { type: "Dépôt", pourcentage: 6, valeur: 2.5 }
+            ],
+            locataires: [
+                { type: "Grands Groupes", pourcentage: 34 },
+                { type: "Sociétés cotées", pourcentage: 24 },
+                { type: "Intra groupe", pourcentage: 16 },
+                { type: "Clients pro", pourcentage: 9 },
+                { type: "État", pourcentage: 8 },
+                { type: "Vacant", pourcentage: 4 }
+            ],
+            evolution: [
+                { year: "2023", valeur: 38.2, loyers: 3.0 },
+                { year: "2024", valeur: 39.8, loyers: 3.2 },
+                { year: "2025", valeur: 41.4, loyers: 3.4 }
+            ]
+        };
+
+        // Evolution annuelle consolidée
+        const YEARLY_EVOLUTION = [
+            { year: "2023", ca_hotel: 19380, ca_immo: 3000, total: 22380, gop: 3707 },
+            { year: "2024", ca_hotel: 20690, ca_immo: 3200, total: 23890, gop: 4161 },
+            { year: "2025", ca_hotel: 21540, ca_immo: 3400, total: 24940, gop: 4540 },
+            { year: "2026B", ca_hotel: 22930, ca_immo: 3600, total: 26530, gop: 5050 }
+        ];
+
+        // COLORS
+        const COLORS = {
+            navy: '#1e2a4a',
+            gold: '#c9a962',
+            blue: '#2d4a7c',
+            green: '#2d7c4a',
+            red: '#c94a4a',
+            orange: '#c97a2d',
+            gray: '#8b8b8b',
+            lightBlue: '#5a7cb8',
+            purple: '#6b4a7c'
+        };
+
+        const PIE_COLORS = ['#1e2a4a', '#2d4a7c', '#5a7cb8', '#c9a962', '#8b8b8b', '#2d7c4a'];
+
+        // ============================================
+        // COMPONENTS
+        // ============================================
+
+        // KPI Card Component
+        const KPICard = ({ title, value, unit, trend, trendValue, subtitle, delay = 0 }) => (
+            <div className={`bg-white rounded-xl p-6 card-shadow kpi-card transition-all duration-300 opacity-0 animate-fade-in`} style={{ animationDelay: `${delay}ms` }}>
+                <p className="text-heintz-gray text-sm font-medium mb-2">{title}</p>
+                <div className="flex items-baseline gap-2">
+                    <span className="text-3xl font-display font-bold text-heintz-navy">{value}</span>
+                    {unit && <span className="text-heintz-gray text-lg">{unit}</span>}
+                </div>
+                {trend && (
+                    <div className={`flex items-center gap-1 mt-2 text-sm ${trend === 'up' ? 'text-heintz-green' : 'text-heintz-red'}`}>
+                        <span>{trend === 'up' ? '↑' : '↓'}</span>
+                        <span>{trendValue}</span>
+                    </div>
+                )}
+                {subtitle && <p className="text-heintz-gray text-xs mt-2">{subtitle}</p>}
+            </div>
+        );
+
+        // Navigation Component
+        const Navigation = ({ activeTab, setActiveTab }) => (
+            <nav className="flex gap-1 bg-white rounded-xl p-1.5 card-shadow">
+                {[
+                    { id: 'overview', label: 'Vue Globale', icon: '◉' },
+                    { id: 'hotellerie', label: 'Pôle Hôtelier', icon: '🏨' },
+                    { id: 'immobilier', label: 'Pôle Immobilier', icon: '🏢' },
+                    { id: 'budget', label: 'Suivi Budget', icon: '📊' }
+                ].map(tab => (
+                    <button
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id)}
+                        className={`px-5 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 flex items-center gap-2 ${
+                            activeTab === tab.id 
+                                ? 'bg-heintz-navy text-white' 
+                                : 'text-heintz-gray hover:bg-heintz-light hover:text-heintz-navy'
+                        }`}
+                    >
+                        <span>{tab.icon}</span>
+                        {tab.label}
+                    </button>
+                ))}
+            </nav>
+        );
+
+        // Custom Tooltip
+        const CustomTooltip = ({ active, payload, label }) => {
+            if (active && payload && payload.length) {
+                return (
+                    <div className="bg-heintz-navy text-white px-4 py-3 rounded-lg shadow-lg">
+                        <p className="font-medium mb-1">{label}</p>
+                        {payload.map((entry, index) => (
+                            <p key={index} className="text-sm opacity-90">
+                                {entry.name}: {typeof entry.value === 'number' ? entry.value.toLocaleString('fr-FR') : entry.value} {entry.unit || ''}
+                            </p>
+                        ))}
+                    </div>
+                );
+            }
+            return null;
+        };
+
+        // ============================================
+        // PAGES
+        // ============================================
+
+        // Overview Page
+        const OverviewPage = () => {
+            const totalCA2025 = 21540 + 3400;
+            const totalGOP2025 = 4540;
+            const totalChambres = 1004;
+            const toMoyen = 70.8;
+            
+            return (
+                <div className="space-y-6">
+                    {/* KPIs Row */}
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                        <KPICard 
+                            title="Chiffre d'Affaires Groupe" 
+                            value="24.9" 
+                            unit="M€" 
+                            trend="up" 
+                            trendValue="+4.4% vs 2024"
+                            subtitle="Hôtellerie + Immobilier"
+                            delay={100}
+                        />
+                        <KPICard 
+                            title="GOP Hôtelier" 
+                            value="4.54" 
+                            unit="M€" 
+                            trend="up" 
+                            trendValue="+9.1% vs 2024"
+                            subtitle="Marge GOP: 21.1%"
+                            delay={200}
+                        />
+                        <KPICard 
+                            title="Parc Hôtelier" 
+                            value="1 004" 
+                            unit="ch." 
+                            subtitle="14 établissements exploités"
+                            delay={300}
+                        />
+                        <KPICard 
+                            title="Patrimoine Immobilier" 
+                            value="41.4" 
+                            unit="M€" 
+                            trend="up" 
+                            trendValue="+4.0% vs 2024"
+                            subtitle="22 496 m² • LTV 37%"
+                            delay={400}
+                        />
+                    </div>
+
+                    {/* Charts Row */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {/* Evolution CA */}
+                        <div className="bg-white rounded-xl p-6 card-shadow">
+                            <h3 className="font-display font-bold text-heintz-navy text-lg mb-4">Évolution du Chiffre d'Affaires Groupe</h3>
+                            <ResponsiveContainer width="100%" height={280}>
+                                <ComposedChart data={YEARLY_EVOLUTION}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" />
+                                    <XAxis dataKey="year" tick={{ fill: '#8b8b8b', fontSize: 12 }} />
+                                    <YAxis tick={{ fill: '#8b8b8b', fontSize: 12 }} tickFormatter={(v) => `${(v/1000).toFixed(0)}M€`} />
+                                    <Tooltip content={<CustomTooltip />} />
+                                    <Legend />
+                                    <Bar dataKey="ca_hotel" name="CA Hôtellerie" fill={COLORS.navy} radius={[4, 4, 0, 0]} />
+                                    <Bar dataKey="ca_immo" name="CA Immobilier" fill={COLORS.gold} radius={[4, 4, 0, 0]} />
+                                    <Line type="monotone" dataKey="gop" name="GOP" stroke={COLORS.green} strokeWidth={3} dot={{ fill: COLORS.green, strokeWidth: 2, r: 5 }} />
+                                </ComposedChart>
+                            </ResponsiveContainer>
+                        </div>
+
+                        {/* Répartition par segment */}
+                        <div className="bg-white rounded-xl p-6 card-shadow">
+                            <h3 className="font-display font-bold text-heintz-navy text-lg mb-4">Répartition CA Hôtelier par Segment</h3>
+                            <ResponsiveContainer width="100%" height={280}>
+                                <PieChart>
+                                    <Pie
+                                        data={[
+                                            { name: 'Haut de gamme (4★)', value: 4600, color: COLORS.gold },
+                                            { name: 'Milieu de gamme (3★)', value: 11480, color: COLORS.navy },
+                                            { name: 'Économique (2★)', value: 2850, color: COLORS.blue },
+                                            { name: 'Super éco (1★)', value: 1110, color: COLORS.gray }
+                                        ]}
+                                        cx="50%"
+                                        cy="50%"
+                                        innerRadius={60}
+                                        outerRadius={100}
+                                        paddingAngle={2}
+                                        dataKey="value"
+                                        label={({ name, percent }) => `${(percent * 100).toFixed(0)}%`}
+                                    >
+                                        {[COLORS.gold, COLORS.navy, COLORS.blue, COLORS.gray].map((color, index) => (
+                                            <Cell key={`cell-${index}`} fill={color} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip formatter={(value) => `${(value/1000).toFixed(1)} M€`} />
+                                    <Legend />
+                                </PieChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+
+                    {/* Bottom Section */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        {/* Top 5 Hôtels */}
+                        <div className="lg:col-span-2 bg-white rounded-xl p-6 card-shadow">
+                            <h3 className="font-display font-bold text-heintz-navy text-lg mb-4">Top 5 Établissements par CA 2025</h3>
+                            <div className="space-y-3">
+                                {HOTEL_PERFORMANCE[2025]
+                                    .map((perf, idx) => ({ ...perf, hotel: HOTELS_DATA[idx] }))
+                                    .sort((a, b) => b.ca - a.ca)
+                                    .slice(0, 5)
+                                    .map((item, idx) => (
+                                        <div key={idx} className="flex items-center gap-4">
+                                            <div className="w-8 h-8 rounded-full bg-heintz-navy text-white flex items-center justify-center font-bold text-sm">
+                                                {idx + 1}
+                                            </div>
+                                            <div className="flex-1">
+                                                <div className="flex justify-between items-center mb-1">
+                                                    <span className="font-medium text-heintz-navy">{item.hotel.name} {item.hotel.city}</span>
+                                                    <span className="font-bold text-heintz-navy">{(item.ca/1000).toFixed(2)} M€</span>
+                                                </div>
+                                                <div className="h-2 bg-heintz-light rounded-full overflow-hidden">
+                                                    <div 
+                                                        className="h-full progress-bar rounded-full transition-all duration-500"
+                                                        style={{ width: `${(item.ca / 4600) * 100}%` }}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className={`text-sm px-2 py-1 rounded ${item.ca >= item.budget ? 'budget-positive' : 'budget-negative'}`}>
+                                                {item.ca >= item.budget ? '+' : ''}{((item.ca - item.budget) / item.budget * 100).toFixed(1)}%
+                                            </div>
+                                        </div>
+                                    ))}
+                            </div>
+                        </div>
+
+                        {/* Alertes */}
+                        <div className="bg-white rounded-xl p-6 card-shadow">
+                            <h3 className="font-display font-bold text-heintz-navy text-lg mb-4">Alertes & Points d'Attention</h3>
+                            <div className="space-y-3">
+                                <div className="p-3 bg-green-50 border-l-4 border-heintz-green rounded-r-lg">
+                                    <p className="text-sm font-medium text-heintz-green">✓ Budget YTD dépassé</p>
+                                    <p className="text-xs text-heintz-gray mt-1">+2.4% vs objectif à fin octobre</p>
+                                </div>
+                                <div className="p-3 bg-orange-50 border-l-4 border-heintz-orange rounded-r-lg">
+                                    <p className="text-sm font-medium text-heintz-orange">⚠ Première Classe Freyming</p>
+                                    <p className="text-xs text-heintz-gray mt-1">TO faible (60.5%) - Plan d'action requis</p>
+                                </div>
+                                <div className="p-3 bg-blue-50 border-l-4 border-heintz-blue rounded-r-lg">
+                                    <p className="text-sm font-medium text-heintz-blue">ℹ Projet La Comédie</p>
+                                    <p className="text-xs text-heintz-gray mt-1">Ouverture prévue T2 2026 • 54 ch.</p>
+                                </div>
+                                <div className="p-3 bg-blue-50 border-l-4 border-heintz-blue rounded-r-lg">
+                                    <p className="text-sm font-medium text-heintz-blue">ℹ Ibis Styles Metz</p>
+                                    <p className="text-xs text-heintz-gray mt-1">Ouverture fin 2025 • 86 ch.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Hotellerie Page
+        const HotelleriePage = () => {
+            const [selectedYear, setSelectedYear] = useState('2025');
+            const [selectedHotel, setSelectedHotel] = useState(null);
+            
+            const yearData = HOTEL_PERFORMANCE[selectedYear];
+            const enrichedData = yearData.map((perf, idx) => ({
+                ...perf,
+                ...HOTELS_DATA[idx]
+            }));
+
+            const avgTO = enrichedData.filter(d => d.to).reduce((sum, d) => sum + d.to, 0) / enrichedData.filter(d => d.to).length;
+            const avgRevPar = enrichedData.filter(d => d.revpar).reduce((sum, d) => sum + d.revpar, 0) / enrichedData.filter(d => d.revpar).length;
+            const totalCA = enrichedData.reduce((sum, d) => sum + (d.ca || 0), 0);
+            const totalBudget = enrichedData.reduce((sum, d) => sum + (d.budget || 0), 0);
+
+            return (
+                <div className="space-y-6">
+                    {/* Year Selector */}
+                    <div className="flex items-center justify-between">
+                        <div className="flex gap-2">
+                            {['2023', '2024', '2025', '2026'].map(year => (
+                                <button
+                                    key={year}
+                                    onClick={() => setSelectedYear(year)}
+                                    className={`px-4 py-2 rounded-lg font-medium text-sm transition-all ${
+                                        selectedYear === year 
+                                            ? 'bg-heintz-navy text-white' 
+                                            : 'bg-white text-heintz-gray hover:bg-heintz-light card-shadow'
+                                    }`}
+                                >
+                                    {year}{year === '2026' && ' (Budget)'}
+                                </button>
+                            ))}
+                        </div>
+                        {selectedHotel && (
+                            <button 
+                                onClick={() => setSelectedHotel(null)}
+                                className="text-sm text-heintz-gray hover:text-heintz-navy"
+                            >
+                                ← Retour vue globale
+                            </button>
+                        )}
+                    </div>
+
+                    {/* KPIs */}
+                    <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+                        <KPICard 
+                            title="CA Total" 
+                            value={selectedYear === '2026' ? '-' : (totalCA/1000).toFixed(1)} 
+                            unit="M€"
+                            subtitle={`Budget: ${(totalBudget/1000).toFixed(1)} M€`}
+                            delay={100}
+                        />
+                        <KPICard 
+                            title="Taux d'Occupation" 
+                            value={selectedYear === '2026' ? '-' : avgTO.toFixed(1)} 
+                            unit="%"
+                            delay={200}
+                        />
+                        <KPICard 
+                            title="RevPAR Moyen" 
+                            value={selectedYear === '2026' ? '-' : avgRevPar.toFixed(1)} 
+                            unit="€"
+                            delay={300}
+                        />
+                        <KPICard 
+                            title="Écart Budget" 
+                            value={selectedYear === '2026' ? '-' : ((totalCA - totalBudget) / totalBudget * 100).toFixed(1)} 
+                            unit="%"
+                            trend={totalCA >= totalBudget ? 'up' : 'down'}
+                            delay={400}
+                        />
+                        <KPICard 
+                            title="Chambres" 
+                            value="1 004"
+                            subtitle="14 établissements"
+                            delay={500}
+                        />
+                    </div>
+
+                    {/* Charts */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {/* CA par hôtel */}
+                        <div className="bg-white rounded-xl p-6 card-shadow">
+                            <h3 className="font-display font-bold text-heintz-navy text-lg mb-4">
+                                {selectedYear === '2026' ? 'Budget' : 'CA Réalisé'} par Établissement (K€)
+                            </h3>
+                            <ResponsiveContainer width="100%" height={400}>
+                                <BarChart 
+                                    data={enrichedData.sort((a, b) => (b.ca || b.budget) - (a.ca || a.budget))} 
+                                    layout="vertical"
+                                    margin={{ left: 120 }}
+                                >
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" />
+                                    <XAxis type="number" tick={{ fill: '#8b8b8b', fontSize: 11 }} />
+                                    <YAxis 
+                                        type="category" 
+                                        dataKey={(d) => `${d.name} ${d.city.split('-')[0]}`} 
+                                        tick={{ fill: '#1e2a4a', fontSize: 11 }}
+                                        width={115}
+                                    />
+                                    <Tooltip content={<CustomTooltip />} />
+                                    <Legend />
+                                    {selectedYear !== '2026' && (
+                                        <Bar dataKey="ca" name="Réalisé" fill={COLORS.navy} radius={[0, 4, 4, 0]} />
+                                    )}
+                                    <Bar dataKey="budget" name="Budget" fill={COLORS.gold} radius={[0, 4, 4, 0]} opacity={selectedYear === '2026' ? 1 : 0.5} />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
+
+                        {/* TO et RevPAR */}
+                        <div className="bg-white rounded-xl p-6 card-shadow">
+                            <h3 className="font-display font-bold text-heintz-navy text-lg mb-4">Performance Opérationnelle {selectedYear}</h3>
+                            {selectedYear === '2026' ? (
+                                <div className="h-[400px] flex items-center justify-center text-heintz-gray">
+                                    Données prévisionnelles non disponibles
+                                </div>
+                            ) : (
+                                <ResponsiveContainer width="100%" height={400}>
+                                    <ComposedChart data={enrichedData.sort((a, b) => b.revpar - a.revpar)}>
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" />
+                                        <XAxis 
+                                            dataKey={(d) => d.city.split('-')[0].substring(0, 8)} 
+                                            tick={{ fill: '#8b8b8b', fontSize: 10 }}
+                                            angle={-45}
+                                            textAnchor="end"
+                                            height={60}
+                                        />
+                                        <YAxis yAxisId="left" tick={{ fill: '#8b8b8b', fontSize: 11 }} />
+                                        <YAxis yAxisId="right" orientation="right" tick={{ fill: '#8b8b8b', fontSize: 11 }} />
+                                        <Tooltip content={<CustomTooltip />} />
+                                        <Legend />
+                                        <Bar yAxisId="left" dataKey="revpar" name="RevPAR (€)" fill={COLORS.navy} radius={[4, 4, 0, 0]} />
+                                        <Line yAxisId="right" type="monotone" dataKey="to" name="TO (%)" stroke={COLORS.gold} strokeWidth={3} dot={{ fill: COLORS.gold, r: 4 }} />
+                                    </ComposedChart>
+                                </ResponsiveContainer>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Table détaillée */}
+                    <div className="bg-white rounded-xl p-6 card-shadow overflow-x-auto">
+                        <h3 className="font-display font-bold text-heintz-navy text-lg mb-4">Détail par Établissement</h3>
+                        <table className="w-full text-sm">
+                            <thead>
+                                <tr className="border-b-2 border-heintz-light">
+                                    <th className="text-left py-3 px-2 font-semibold text-heintz-navy">Établissement</th>
+                                    <th className="text-center py-3 px-2 font-semibold text-heintz-navy">★</th>
+                                    <th className="text-center py-3 px-2 font-semibold text-heintz-navy">Ch.</th>
+                                    <th className="text-right py-3 px-2 font-semibold text-heintz-navy">CA (K€)</th>
+                                    <th className="text-right py-3 px-2 font-semibold text-heintz-navy">Budget</th>
+                                    <th className="text-right py-3 px-2 font-semibold text-heintz-navy">Écart</th>
+                                    <th className="text-right py-3 px-2 font-semibold text-heintz-navy">TO</th>
+                                    <th className="text-right py-3 px-2 font-semibold text-heintz-navy">RevPAR</th>
+                                    <th className="text-right py-3 px-2 font-semibold text-heintz-navy">ADR</th>
+                                    <th className="text-right py-3 px-2 font-semibold text-heintz-navy">GOP</th>
+                                    <th className="text-right py-3 px-2 font-semibold text-heintz-navy">Marge</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {enrichedData.map((item, idx) => {
+                                    const ecart = item.ca ? ((item.ca - item.budget) / item.budget * 100).toFixed(1) : '-';
+                                    return (
+                                        <tr key={idx} className="border-b border-heintz-light table-row">
+                                            <td className="py-3 px-2">
+                                                <span className="font-medium text-heintz-navy">{item.name}</span>
+                                                <br />
+                                                <span className="text-xs text-heintz-gray">{item.city}</span>
+                                            </td>
+                                            <td className="text-center py-3 px-2 text-heintz-gold">{'★'.repeat(item.stars)}</td>
+                                            <td className="text-center py-3 px-2">{item.rooms}</td>
+                                            <td className="text-right py-3 px-2 font-semibold">{item.ca ? item.ca.toLocaleString() : '-'}</td>
+                                            <td className="text-right py-3 px-2 text-heintz-gray">{item.budget.toLocaleString()}</td>
+                                            <td className={`text-right py-3 px-2 font-medium ${ecart !== '-' && parseFloat(ecart) >= 0 ? 'text-heintz-green' : 'text-heintz-red'}`}>
+                                                {ecart !== '-' ? `${ecart}%` : '-'}
+                                            </td>
+                                            <td className="text-right py-3 px-2">{item.to ? `${item.to}%` : '-'}</td>
+                                            <td className="text-right py-3 px-2">{item.revpar ? `${item.revpar}€` : '-'}</td>
+                                            <td className="text-right py-3 px-2">{item.adr ? `${item.adr}€` : '-'}</td>
+                                            <td className="text-right py-3 px-2 font-semibold">{item.gop ? `${item.gop}K` : '-'}</td>
+                                            <td className="text-right py-3 px-2">{item.gopMargin ? `${item.gopMargin}%` : '-'}</td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                            <tfoot>
+                                <tr className="bg-heintz-light font-bold">
+                                    <td className="py-3 px-2 text-heintz-navy">TOTAL</td>
+                                    <td></td>
+                                    <td className="text-center py-3 px-2">1 004</td>
+                                    <td className="text-right py-3 px-2">{selectedYear === '2026' ? '-' : totalCA.toLocaleString()}</td>
+                                    <td className="text-right py-3 px-2">{totalBudget.toLocaleString()}</td>
+                                    <td className={`text-right py-3 px-2 ${totalCA >= totalBudget ? 'text-heintz-green' : 'text-heintz-red'}`}>
+                                        {selectedYear === '2026' ? '-' : `${((totalCA - totalBudget) / totalBudget * 100).toFixed(1)}%`}
+                                    </td>
+                                    <td className="text-right py-3 px-2">{selectedYear === '2026' ? '-' : `${avgTO.toFixed(1)}%`}</td>
+                                    <td className="text-right py-3 px-2">{selectedYear === '2026' ? '-' : `${avgRevPar.toFixed(1)}€`}</td>
+                                    <td></td>
+                                    <td className="text-right py-3 px-2">
+                                        {selectedYear === '2026' ? '-' : `${(enrichedData.reduce((s, d) => s + (d.gop || 0), 0)).toLocaleString()}K`}
+                                    </td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            );
+        };
+
+        // Immobilier Page
+        const ImmobilierPage = () => {
+            return (
+                <div className="space-y-6">
+                    {/* KPIs */}
+                    <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+                        <KPICard 
+                            title="Valeur du Patrimoine" 
+                            value="41.4" 
+                            unit="M€"
+                            trend="up"
+                            trendValue="+4.0% vs 2024"
+                            delay={100}
+                        />
+                        <KPICard 
+                            title="Surface Totale" 
+                            value="22 496" 
+                            unit="m²"
+                            delay={200}
+                        />
+                        <KPICard 
+                            title="Loyers Triple Net" 
+                            value="3.2" 
+                            unit="M€"
+                            subtitle="Taux capi: 7.3%"
+                            delay={300}
+                        />
+                        <KPICard 
+                            title="LTV" 
+                            value="37" 
+                            unit="%"
+                            subtitle="Dettes: 15.3 M€"
+                            delay={400}
+                        />
+                        <KPICard 
+                            title="DSCR" 
+                            value="149" 
+                            unit="%"
+                            subtitle="Ratio confortable"
+                            delay={500}
+                        />
+                    </div>
+
+                    {/* Charts Row */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        {/* Répartition par type */}
+                        <div className="bg-white rounded-xl p-6 card-shadow">
+                            <h3 className="font-display font-bold text-heintz-navy text-lg mb-4">Répartition par Type d'Actif</h3>
+                            <ResponsiveContainer width="100%" height={280}>
+                                <PieChart>
+                                    <Pie
+                                        data={IMMOBILIER_DATA.actifs}
+                                        cx="50%"
+                                        cy="50%"
+                                        innerRadius={50}
+                                        outerRadius={90}
+                                        paddingAngle={2}
+                                        dataKey="pourcentage"
+                                        label={({ type, pourcentage }) => `${pourcentage}%`}
+                                    >
+                                        {IMMOBILIER_DATA.actifs.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip formatter={(value) => `${value}%`} />
+                                    <Legend formatter={(value, entry) => entry.payload.type} />
+                                </PieChart>
+                            </ResponsiveContainer>
+                        </div>
+
+                        {/* Répartition locataires */}
+                        <div className="bg-white rounded-xl p-6 card-shadow">
+                            <h3 className="font-display font-bold text-heintz-navy text-lg mb-4">Typologie Locataires</h3>
+                            <ResponsiveContainer width="100%" height={280}>
+                                <BarChart data={IMMOBILIER_DATA.locataires} layout="vertical" margin={{ left: 80 }}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" />
+                                    <XAxis type="number" tick={{ fill: '#8b8b8b', fontSize: 11 }} unit="%" />
+                                    <YAxis type="category" dataKey="type" tick={{ fill: '#1e2a4a', fontSize: 11 }} width={75} />
+                                    <Tooltip formatter={(value) => `${value}%`} />
+                                    <Bar dataKey="pourcentage" fill={COLORS.navy} radius={[0, 4, 4, 0]}>
+                                        {IMMOBILIER_DATA.locataires.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={entry.type === 'Vacant' ? COLORS.red : COLORS.navy} />
+                                        ))}
+                                    </Bar>
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
+
+                        {/* Evolution */}
+                        <div className="bg-white rounded-xl p-6 card-shadow">
+                            <h3 className="font-display font-bold text-heintz-navy text-lg mb-4">Évolution Patrimoine</h3>
+                            <ResponsiveContainer width="100%" height={280}>
+                                <ComposedChart data={IMMOBILIER_DATA.evolution}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" />
+                                    <XAxis dataKey="year" tick={{ fill: '#8b8b8b', fontSize: 12 }} />
+                                    <YAxis yAxisId="left" tick={{ fill: '#8b8b8b', fontSize: 11 }} tickFormatter={(v) => `${v}M€`} />
+                                    <YAxis yAxisId="right" orientation="right" tick={{ fill: '#8b8b8b', fontSize: 11 }} tickFormatter={(v) => `${v}M€`} />
+                                    <Tooltip />
+                                    <Legend />
+                                    <Area yAxisId="left" type="monotone" dataKey="valeur" name="Valeur" fill={COLORS.navy} fillOpacity={0.2} stroke={COLORS.navy} strokeWidth={2} />
+                                    <Bar yAxisId="right" dataKey="loyers" name="Loyers" fill={COLORS.gold} radius={[4, 4, 0, 0]} />
+                                </ComposedChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+
+                    {/* Indicateurs financiers */}
+                    <div className="bg-white rounded-xl p-6 card-shadow">
+                        <h3 className="font-display font-bold text-heintz-navy text-lg mb-6">Synthèse Financière Immobilier</h3>
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            {/* Loyers */}
+                            <div>
+                                <h4 className="font-medium text-heintz-gray mb-4">Revenus Locatifs</h4>
+                                <div className="space-y-3">
+                                    <div className="flex justify-between items-center py-2 border-b border-heintz-light">
+                                        <span className="text-heintz-gray">Loyers bruts annuels</span>
+                                        <span className="font-bold text-heintz-navy">3.4 M€</span>
+                                    </div>
+                                    <div className="flex justify-between items-center py-2 border-b border-heintz-light">
+                                        <span className="text-heintz-gray">Loyers triple net</span>
+                                        <span className="font-bold text-heintz-navy">3.2 M€</span>
+                                    </div>
+                                    <div className="flex justify-between items-center py-2">
+                                        <span className="text-heintz-gray">Taux capitalisation</span>
+                                        <span className="font-bold text-heintz-green">7.3%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {/* Endettement */}
+                            <div>
+                                <h4 className="font-medium text-heintz-gray mb-4">Structure d'Endettement</h4>
+                                <div className="space-y-3">
+                                    <div className="flex justify-between items-center py-2 border-b border-heintz-light">
+                                        <span className="text-heintz-gray">Dettes totales</span>
+                                        <span className="font-bold text-heintz-navy">15.3 M€</span>
+                                    </div>
+                                    <div className="flex justify-between items-center py-2 border-b border-heintz-light">
+                                        <span className="text-heintz-gray">Remboursement annuel</span>
+                                        <span className="font-bold text-heintz-navy">2.1 M€</span>
+                                    </div>
+                                    <div className="flex justify-between items-center py-2">
+                                        <span className="text-heintz-gray">Loan to Value</span>
+                                        <span className="font-bold text-heintz-green">37%</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Ratios */}
+                            <div>
+                                <h4 className="font-medium text-heintz-gray mb-4">Ratios de Couverture</h4>
+                                <div className="space-y-3">
+                                    <div className="flex justify-between items-center py-2 border-b border-heintz-light">
+                                        <span className="text-heintz-gray">DSCR (loyers nets)</span>
+                                        <span className="font-bold text-heintz-green">149%</span>
+                                    </div>
+                                    <div className="flex justify-between items-center py-2 border-b border-heintz-light">
+                                        <span className="text-heintz-gray">Taux vacance</span>
+                                        <span className="font-bold text-heintz-orange">4%</span>
+                                    </div>
+                                    <div className="flex justify-between items-center py-2">
+                                        <span className="text-heintz-gray">Rendement €/m²</span>
+                                        <span className="font-bold text-heintz-navy">151 €/m²</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Budget Page
+        const BudgetPage = () => {
+            const ytdRealise = MONTHLY_DATA_2025.filter(m => m.realise).reduce((sum, m) => sum + m.realise, 0);
+            const ytdBudget = MONTHLY_DATA_2025.slice(0, 10).reduce((sum, m) => sum + m.budget, 0);
+            const ytdEcart = ytdRealise - ytdBudget;
+            const ytdEcartPct = (ytdEcart / ytdBudget * 100).toFixed(1);
+
+            const projectionFY = ytdRealise + (ytdRealise / 10 * 2);
+
+            return (
+                <div className="space-y-6">
+                    {/* KPIs */}
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                        <KPICard 
+                            title="Réalisé YTD (Oct.)" 
+                            value={(ytdRealise/1000).toFixed(1)} 
+                            unit="M€"
+                            trend={ytdEcart >= 0 ? 'up' : 'down'}
+                            trendValue={`${ytdEcart >= 0 ? '+' : ''}${ytdEcartPct}% vs budget`}
+                            delay={100}
+                        />
+                        <KPICard 
+                            title="Budget YTD" 
+                            value={(ytdBudget/1000).toFixed(1)} 
+                            unit="M€"
+                            delay={200}
+                        />
+                        <KPICard 
+                            title="Budget Annuel" 
+                            value="22.5" 
+                            unit="M€"
+                            subtitle="Pôle hôtelier uniquement"
+                            delay={300}
+                        />
+                        <KPICard 
+                            title="Projection FY" 
+                            value={(projectionFY/1000).toFixed(1)} 
+                            unit="M€"
+                            trend="up"
+                            trendValue={`+${((projectionFY/22530 - 1) * 100).toFixed(1)}% vs budget`}
+                            delay={400}
+                        />
+                    </div>
+
+                    {/* Charts */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {/* Mensuel */}
+                        <div className="bg-white rounded-xl p-6 card-shadow">
+                            <h3 className="font-display font-bold text-heintz-navy text-lg mb-4">Suivi Mensuel Budget vs Réalisé</h3>
+                            <ResponsiveContainer width="100%" height={320}>
+                                <ComposedChart data={MONTHLY_DATA_2025}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" />
+                                    <XAxis dataKey="month" tick={{ fill: '#8b8b8b', fontSize: 12 }} />
+                                    <YAxis tick={{ fill: '#8b8b8b', fontSize: 11 }} tickFormatter={(v) => `${v}K`} />
+                                    <Tooltip content={<CustomTooltip />} />
+                                    <Legend />
+                                    <Bar dataKey="budget" name="Budget" fill={COLORS.gray} radius={[4, 4, 0, 0]} opacity={0.5} />
+                                    <Bar dataKey="realise" name="Réalisé" fill={COLORS.navy} radius={[4, 4, 0, 0]} />
+                                    <ReferenceLine y={0} stroke="#000" />
+                                </ComposedChart>
+                            </ResponsiveContainer>
+                        </div>
+
+                        {/* Cumulé */}
+                        <div className="bg-white rounded-xl p-6 card-shadow">
+                            <h3 className="font-display font-bold text-heintz-navy text-lg mb-4">Évolution Cumulée</h3>
+                            <ResponsiveContainer width="100%" height={320}>
+                                <AreaChart data={MONTHLY_DATA_2025}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" />
+                                    <XAxis dataKey="month" tick={{ fill: '#8b8b8b', fontSize: 12 }} />
+                                    <YAxis tick={{ fill: '#8b8b8b', fontSize: 11 }} tickFormatter={(v) => `${(v/1000).toFixed(0)}M`} />
+                                    <Tooltip content={<CustomTooltip />} />
+                                    <Legend />
+                                    <Area type="monotone" dataKey="cumul_budget" name="Budget cumulé" stroke={COLORS.gray} fill={COLORS.gray} fillOpacity={0.2} strokeDasharray="5 5" />
+                                    <Area type="monotone" dataKey="cumul_realise" name="Réalisé cumulé" stroke={COLORS.navy} fill={COLORS.navy} fillOpacity={0.3} />
+                                </AreaChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+
+                    {/* Table mensuelle */}
+                    <div className="bg-white rounded-xl p-6 card-shadow overflow-x-auto">
+                        <h3 className="font-display font-bold text-heintz-navy text-lg mb-4">Détail Mensuel 2025 - Pôle Hôtelier (K€)</h3>
+                        <table className="w-full text-sm">
+                            <thead>
+                                <tr className="border-b-2 border-heintz-light">
+                                    <th className="text-left py-3 px-3 font-semibold text-heintz-navy">Mois</th>
+                                    <th className="text-right py-3 px-3 font-semibold text-heintz-navy">Budget</th>
+                                    <th className="text-right py-3 px-3 font-semibold text-heintz-navy">Réalisé</th>
+                                    <th className="text-right py-3 px-3 font-semibold text-heintz-navy">Écart</th>
+                                    <th className="text-right py-3 px-3 font-semibold text-heintz-navy">Écart %</th>
+                                    <th className="text-right py-3 px-3 font-semibold text-heintz-navy">Budget Cum.</th>
+                                    <th className="text-right py-3 px-3 font-semibold text-heintz-navy">Réalisé Cum.</th>
+                                    <th className="text-right py-3 px-3 font-semibold text-heintz-navy">Écart Cum.</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {MONTHLY_DATA_2025.map((item, idx) => {
+                                    const ecartPct = item.ecart !== null ? (item.ecart / item.budget * 100).toFixed(1) : null;
+                                    const ecartCumul = item.cumul_realise !== null ? item.cumul_realise - item.cumul_budget : null;
+                                    return (
+                                        <tr key={idx} className={`border-b border-heintz-light table-row ${item.realise === null ? 'opacity-50' : ''}`}>
+                                            <td className="py-3 px-3 font-medium text-heintz-navy">{item.month}</td>
+                                            <td className="text-right py-3 px-3">{item.budget.toLocaleString()}</td>
+                                            <td className="text-right py-3 px-3 font-semibold">{item.realise ? item.realise.toLocaleString() : '-'}</td>
+                                            <td className={`text-right py-3 px-3 font-medium ${item.ecart !== null ? (item.ecart >= 0 ? 'text-heintz-green' : 'text-heintz-red') : ''}`}>
+                                                {item.ecart !== null ? `${item.ecart >= 0 ? '+' : ''}${item.ecart}` : '-'}
+                                            </td>
+                                            <td className="text-right py-3 px-3">
+                                                {ecartPct !== null ? (
+                                                    <span className={`px-2 py-1 rounded text-xs font-medium ${parseFloat(ecartPct) >= 0 ? 'budget-positive' : 'budget-negative'}`}>
+                                                        {ecartPct >= 0 ? '+' : ''}{ecartPct}%
+                                                    </span>
+                                                ) : '-'}
+                                            </td>
+                                            <td className="text-right py-3 px-3 text-heintz-gray">{item.cumul_budget.toLocaleString()}</td>
+                                            <td className="text-right py-3 px-3 font-semibold">{item.cumul_realise ? item.cumul_realise.toLocaleString() : '-'}</td>
+                                            <td className={`text-right py-3 px-3 font-medium ${ecartCumul !== null ? (ecartCumul >= 0 ? 'text-heintz-green' : 'text-heintz-red') : ''}`}>
+                                                {ecartCumul !== null ? `${ecartCumul >= 0 ? '+' : ''}${ecartCumul}` : '-'}
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {/* Analyse écarts par hôtel */}
+                    <div className="bg-white rounded-xl p-6 card-shadow">
+                        <h3 className="font-display font-bold text-heintz-navy text-lg mb-4">Analyse des Écarts par Établissement - 2025</h3>
+                        <ResponsiveContainer width="100%" height={350}>
+                            <BarChart 
+                                data={HOTEL_PERFORMANCE[2025].map((perf, idx) => ({
+                                    name: `${HOTELS_DATA[idx].name} ${HOTELS_DATA[idx].city.split('-')[0].substring(0,6)}`,
+                                    ecart: perf.ca - perf.budget,
+                                    ecartPct: ((perf.ca - perf.budget) / perf.budget * 100).toFixed(1)
+                                })).sort((a, b) => b.ecart - a.ecart)}
+                                margin={{ bottom: 80 }}
+                            >
+                                <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" />
+                                <XAxis 
+                                    dataKey="name" 
+                                    tick={{ fill: '#8b8b8b', fontSize: 10 }}
+                                    angle={-45}
+                                    textAnchor="end"
+                                    height={80}
+                                />
+                                <YAxis tick={{ fill: '#8b8b8b', fontSize: 11 }} tickFormatter={(v) => `${v}K`} />
+                                <Tooltip 
+                                    formatter={(value, name) => [
+                                        name === 'ecart' ? `${value >= 0 ? '+' : ''}${value} K€` : value,
+                                        name === 'ecart' ? 'Écart' : name
+                                    ]}
+                                />
+                                <ReferenceLine y={0} stroke={COLORS.gray} strokeWidth={2} />
+                                <Bar dataKey="ecart" name="Écart Budget" radius={[4, 4, 0, 0]}>
+                                    {HOTEL_PERFORMANCE[2025].map((perf, idx) => (
+                                        <Cell key={idx} fill={perf.ca >= perf.budget ? COLORS.green : COLORS.red} />
+                                    ))}
+                                </Bar>
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+            );
+        };
+
+        // ============================================
+        // MAIN APP
+        // ============================================
+
+        const App = () => {
+            const [activeTab, setActiveTab] = useState('overview');
+            const currentDate = new Date().toLocaleDateString('fr-FR', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+
+            return (
+                <div className="min-h-screen bg-heintz-light">
+                    {/* Header */}
+                    <header className="gradient-header text-white sticky top-0 z-50">
+                        <div className="max-w-7xl mx-auto px-6 py-4">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-4">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
+                                            <span className="text-heintz-navy font-display font-bold text-lg">H</span>
+                                        </div>
+                                        <div>
+                                            <h1 className="font-display font-bold text-xl">Heintz Immobilier & Hôtellerie</h1>
+                                            <p className="text-white/70 text-xs">Dashboard Contrôle de Gestion</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="text-right">
+                                    <p className="text-white/70 text-xs">Dernière mise à jour</p>
+                                    <p className="text-sm font-medium">{currentDate}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </header>
+
+                    {/* Navigation */}
+                    <div className="max-w-7xl mx-auto px-6 py-4">
+                        <Navigation activeTab={activeTab} setActiveTab={setActiveTab} />
+                    </div>
+
+                    {/* Content */}
+                    <main className="max-w-7xl mx-auto px-6 pb-12">
+                        {activeTab === 'overview' && <OverviewPage />}
+                        {activeTab === 'hotellerie' && <HotelleriePage />}
+                        {activeTab === 'immobilier' && <ImmobilierPage />}
+                        {activeTab === 'budget' && <BudgetPage />}
+                    </main>
+
+                    {/* Footer */}
+                    <footer className="bg-white border-t border-heintz-light py-6">
+                        <div className="max-w-7xl mx-auto px-6">
+                            <div className="flex items-center justify-between text-sm text-heintz-gray">
+                                <p>MVP Dashboard - Démonstration Contrôle de Gestion</p>
+                                <p>Données fictives à titre illustratif</p>
+                            </div>
+                        </div>
+                    </footer>
+                </div>
+            );
+        };
+
+        // Render
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
