@@ -3,1201 +3,921 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Heintz Dashboard - Contrôle de Gestion</title>
-
-    <!-- React -->
+    <title>Heintz Dashboard V3 — Contrôle de Gestion</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prop-types/15.8.1/prop-types.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
-    <!-- Recharts -->
     <script src="https://cdn.jsdelivr.net/npm/recharts@2.5.0/umd/Recharts.min.js"></script>
-
-    <!-- Leaflet -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-    <!-- Export Excel -->
     <script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#1e3a5f',
-                        secondary: '#d4a853',
-                        success: '#10b981',
-                        warning: '#f59e0b',
-                        danger: '#ef4444',
-                        surface: '#f8fafc',
-                        muted: '#64748b'
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif']
-                    }
-                }
-            }
-        }
+        tailwind.config={theme:{extend:{colors:{primary:'#1e3a5f',secondary:'#d4a853',success:'#10b981',warning:'#f59e0b',danger:'#ef4444',surface:'#f8fafc',muted:'#64748b'},fontFamily:{sans:['Inter','sans-serif']}}}}
     </script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: #f1f5f9; }
-        .gradient-header { background: linear-gradient(135deg, #1e3a5f 0%, #2d5a8e 100%); }
-        .kpi-card { transition: all 0.2s ease; }
-        .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(30,58,95,0.15); }
-        .nav-tab { transition: all 0.2s ease; }
-        .nav-tab:hover { background: rgba(30,58,95,0.08); }
-        .nav-tab.active { color: #1e3a5f; border-bottom: 3px solid #d4a853; font-weight: 600; }
-        .hotel-card { transition: all 0.2s ease; cursor: pointer; }
-        .hotel-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
-        .hotel-card.selected { ring: 2px; border-color: #d4a853; box-shadow: 0 0 0 3px rgba(212,168,83,0.3); }
-        .status-badge { display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
-        .leaflet-container { border-radius: 0.75rem; z-index: 1; }
-        .progress-bar { transition: width 0.5s ease; }
-        .export-btn { transition: all 0.15s ease; }
-        .export-btn:hover { transform: scale(1.05); }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-        @media (max-width: 768px) {
-            .nav-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-            .nav-scroll::-webkit-scrollbar { display: none; }
-        }
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Inter',sans-serif;background:#f1f5f9}
+        .gradient-header{background:linear-gradient(135deg,#1e3a5f 0%,#2d5a8e 100%)}
+        .kpi-card{transition:all .2s ease}.kpi-card:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(30,58,95,.15)}
+        .nav-tab{transition:all .2s ease}.nav-tab:hover{background:rgba(30,58,95,.08)}
+        .nav-tab.active{color:#1e3a5f;border-bottom:3px solid #d4a853;font-weight:600}
+        .hotel-card{transition:all .2s ease;cursor:pointer}.hotel-card:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.1)}
+        .status-badge{display:inline-flex;align-items:center;padding:2px 10px;border-radius:9999px;font-size:.75rem;font-weight:600}
+        .leaflet-container{border-radius:.75rem;z-index:1}
+        .progress-bar{transition:width .5s ease}
+        .org-node{transition:all .2s ease}.org-node:hover{transform:scale(1.03);box-shadow:0 4px 15px rgba(0,0,0,.1)}
+        .heatmap-cell{border-radius:4px;transition:all .15s ease}
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+        .live-dot{animation:pulse 2s infinite;width:8px;height:8px;border-radius:50%;background:#10b981;display:inline-block}
+        .slide-enter{animation:slideIn .3s ease}
+        @keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+        ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#f1f5f9}::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}
+        @media(max-width:768px){.nav-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}.nav-scroll::-webkit-scrollbar{display:none}}
+        @media print{.no-print{display:none!important}}
+        .sim-slider{-webkit-appearance:none;height:6px;border-radius:3px;background:#e2e8f0;outline:none;width:100%}
+        .sim-slider::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#1e3a5f;cursor:pointer}
     </style>
 </head>
 <body>
-    <div id="root"></div>
+<div id="root"></div>
+<script type="text/babel">
+const {useState,useEffect,useRef,useMemo,useCallback}=React;
+const {ResponsiveContainer,ComposedChart,Bar,Line,Area,AreaChart,XAxis,YAxis,CartesianGrid,Tooltip,Legend,PieChart,Pie,Cell,BarChart,ReferenceLine}=Recharts;
 
-    <script type="text/babel">
-    const { useState, useEffect, useRef, useMemo } = React;
-    const {
-        ResponsiveContainer, ComposedChart, Bar, Line, Area, AreaChart,
-        XAxis, YAxis, CartesianGrid, Tooltip, Legend,
-        PieChart, Pie, Cell, BarChart,
-        ReferenceLine
-    } = Recharts;
+// ========== SEASONALITY Grand Est ==========
+const SEASON={
+    monthly:[{m:"Jan",c:0.72,l:"Creux hivernal"},{m:"Fév",c:0.75,l:"Hiver, vac. zone B"},{m:"Mar",c:0.85,l:"Reprise printanière"},{m:"Avr",c:0.93,l:"Pâques, ponts"},{m:"Mai",c:1.02,l:"Ponts mai"},{m:"Jun",c:1.15,l:"Début été"},{m:"Jul",c:1.22,l:"Pic estival"},{m:"Aoû",c:1.18,l:"Été"},{m:"Sep",c:1.08,l:"Rentrée, Foire Metz"},{m:"Oct",c:0.95,l:"Automne"},{m:"Nov",c:0.78,l:"Creux automnal"},{m:"Déc",c:1.07,l:"Marchés de Noël +15%"}],
+    weekly:[{j:"Lun",c:0.85},{j:"Mar",c:1.15},{j:"Mer",c:1.20},{j:"Jeu",c:1.12},{j:"Ven",c:1.05},{j:"Sam",c:0.82},{j:"Dim",c:0.62}]
+};
 
-    // =====================================================
-    // DATA
-    // =====================================================
+// ========== HOTELS — Données réelles plaquette 10/10/2025 ==========
+const H=[
+    {id:1,n:"Ibis Styles Châlons",v:"Châlons-en-Champagne",lat:48.9567,lng:4.3634,ch:70,e:3,ca:2250,caM:0,prop:"Murs et fonds",acq:"Ouverture août 2017",reno:"—",lab:["Clef Verte"],ens:"Accor",fr:"Ibis Styles",to:76,adr:112,rp:85.1,gp:31.2,cc:62,dir:"Antoine Richard",tel:"03 26 65 60 60",eq:["PDJ inclus","Bar","Parking","Wifi","Séminaires"]},
+    {id:2,n:"Ibis Budget Forbach",v:"Forbach",lat:49.1845,lng:6.9012,ch:71,e:2,ca:700,caM:0,prop:"Fonds acquis 2017",acq:"Réouverture oct. 2022",reno:"Réno complète 2017-2022",lab:["Clef Verte"],ens:"Accor",fr:"Ibis Budget",to:61,adr:44,rp:26.8,gp:10.2,cc:32,dir:"Yannick Weber",tel:"08 92 68 09 17",eq:["Parking","Wifi"]},
+    {id:3,n:"B&B Thionville",v:"Thionville",lat:49.3567,lng:6.1678,ch:76,e:3,ca:1500,caM:0,prop:"Murs et fonds",acq:"Ouverture jan. 2021",reno:"Construit jan. 2020",lab:["Accueil Vélo"],ens:"B&B Hotels",fr:"B&B",to:70,adr:77,rp:53.9,gp:19.4,cc:45,dir:"Julie Renard",tel:"08 92 78 29 29",eq:["Parking","Wifi","PDJ buffet"]},
+    {id:4,n:"Ibis Styles Sarrebourg",v:"Sarrebourg",lat:48.7345,lng:7.0534,ch:48,e:3,ca:1080,caM:0,prop:"Murs et fonds",acq:"Acquisition juil. 2013",reno:"2013-14 / 2023",lab:["Clef Verte","Accueil Vélo"],ens:"Accor",fr:"Ibis Styles",to:68,adr:91,rp:61.9,gp:22.5,cc:52,dir:"François Muller",tel:"03 87 03 55 55",eq:["PDJ inclus","Parking","Wifi"]},
+    {id:5,n:"Première Classe Jouy",v:"Jouy-aux-Arches",lat:49.0623,lng:6.0756,ch:71,e:1,ca:620,caM:620,prop:"Murs et fonds",acq:"Acquisition mars 2022",reno:"—",lab:["Clef Verte","Accueil Vélo"],ens:"Louvre Hotels",fr:"Première Classe",to:63,adr:38,rp:23.9,gp:8.2,cc:28,dir:"Pierre Garnier",tel:"03 87 36 58 20",eq:["Parking","Wifi"]},
+    {id:6,n:"Ibis Budget Metz",v:"Metz",lat:49.0834,lng:6.1623,ch:82,e:2,ca:1300,caM:1300,prop:"Fonds acquis 2016",acq:"Acquisition 2016",reno:"Réno complète 2016-2018",lab:["Clef Verte","Accueil Vélo"],ens:"Accor",fr:"Ibis Budget",to:72,adr:60,rp:43.2,gp:18.2,cc:38,dir:"Thomas Petit",tel:"08 92 68 07 81",eq:["Parking","Wifi"]},
+    {id:7,n:"Mercure Metz Centre",v:"Metz",lat:49.1193,lng:6.1757,ch:112,e:4,ca:4600,caM:4600,prop:"Murs et fonds",acq:"Acquisition juil. 2019",reno:"—",lab:["Clef Verte","Accueil Vélo"],ens:"Accor",fr:"Mercure",to:78,adr:144,rp:112.3,gp:42.8,cc:82,dir:"Laurent Martin",tel:"03 87 38 50 50",eq:["Restaurant","Bar","Séminaires","Parking","Wifi","Fitness"]},
+    {id:8,n:"Ibis Budget Sarrebourg",v:"Sarrebourg",lat:48.7323,lng:7.0567,ch:61,e:2,ca:850,caM:0,prop:"Murs et fonds",acq:"Acquisition 2013",reno:"Agrandissement 2016-18",lab:["Clef Verte"],ens:"Accor",fr:"Ibis Budget",to:66,adr:58,rp:38.3,gp:14.8,cc:35,dir:"François Muller",tel:"03 87 03 90 90",eq:["Parking","Wifi"]},
+    {id:9,n:"Première Classe Freyming",v:"Freyming-Merlebach",lat:49.1456,lng:6.7923,ch:71,e:1,ca:490,caM:0,prop:"Murs et fonds",acq:"Acquisition sept. 2018",reno:"Réno intégrale en cours",lab:[],ens:"Louvre Hotels",fr:"Première Classe",to:58,adr:33,rp:19.1,gp:6.4,cc:24,dir:"Yannick Weber",tel:"03 87 81 33 00",eq:["Parking","Wifi"]},
+    {id:10,n:"Campanile Jouy-aux-Arches",v:"Jouy-aux-Arches",lat:49.0612,lng:6.0789,ch:59,e:3,ca:1000,caM:1000,prop:"Murs et fonds",acq:"Acquisition mars 2022",reno:"Réno complète sept. 2023",lab:["Clef Verte","Accueil Vélo"],ens:"Louvre Hotels",fr:"Campanile",to:65,adr:71,rp:46.2,gp:15.6,cc:48,dir:"Claire Moreau",tel:"03 87 36 56 10",eq:["Restaurant","Parking","Wifi"]},
+    {id:11,n:"Ibis Châlons",v:"Châlons-en-Champagne",lat:48.9589,lng:4.3612,ch:43,e:3,ca:1170,caM:0,prop:"Murs et fonds",acq:"Acquisition oct. 2023",reno:"—",lab:["Clef Verte"],ens:"Accor",fr:"Ibis",to:72,adr:103,rp:74.2,gp:26.8,cc:56,dir:"Émilie Fournier",tel:"03 26 65 16 65",eq:["Bar","Parking","Wifi"]},
+    {id:12,n:"Campanile Metz",v:"Metz",lat:49.0912,lng:6.1534,ch:75,e:3,ca:1680,caM:1680,prop:"Murs et fonds",acq:"Acquisition nov. 2023",reno:"—",lab:["Clef Verte"],ens:"Louvre Hotels",fr:"Campanile",to:71,adr:86,rp:61.1,gp:20.8,cc:55,dir:"Nathalie Leroy",tel:"03 87 63 91 00",eq:["Restaurant","Parking","Wifi"]},
+    {id:13,n:"Ibis Metz Centre",v:"Metz",lat:49.1097,lng:6.1789,ch:79,e:3,ca:1900,caM:1900,prop:"Murs et fonds",acq:"Acquisition fév. 2025",reno:"Rénovation 2025",lab:["Accueil Vélo"],ens:"Accor",fr:"Ibis",to:74,adr:89,rp:65.9,gp:24.1,cc:58,dir:"Sophie Bernard",tel:"03 87 31 01 73",eq:["Bar","Parking","Wifi"]},
+    {id:14,n:"Ibis Styles Metz Centre",v:"Metz",lat:49.1156,lng:6.1812,ch:86,e:3,ca:2400,caM:2400,prop:"Murs et fonds",acq:"Ouverture fin 2025",reno:"Construction",lab:[],ens:"Accor",fr:"Ibis Styles",to:76,adr:100,rp:76.0,gp:28.5,cc:62,dir:"Marc Dupont",tel:"03 87 66 74 22",eq:["PDJ inclus","Bar","Wifi","Parking"]}
+];
 
-    const HOTELS = [
-        { id: 1, name: "Mercure Metz Centre", lat: 49.1193, lng: 6.1757, chambres: 112, etoiles: 4, ca: 4600, to: 78, adr: 115, revpar: 89.7, goppar: 32.4, coutChambre: 82, directeur: "Laurent Martin", tel: "03 87 38 50 50", equip: ["Restaurant","Bar","Séminaires","Parking","Wifi","Fitness"], certif: ["Clef Verte"], segment: "4*" },
-        { id: 2, name: "Ibis Metz Centre", lat: 49.1097, lng: 6.1789, chambres: 79, etoiles: 3, ca: 1900, to: 74, adr: 89, revpar: 65.9, goppar: 24.1, coutChambre: 58, directeur: "Sophie Bernard", tel: "03 87 31 01 73", equip: ["Bar","Parking","Wifi"], certif: [], segment: "3*" },
-        { id: 3, name: "Ibis Styles Metz", lat: 49.1156, lng: 6.1812, chambres: 86, etoiles: 3, ca: 2400, to: 76, adr: 100, revpar: 76.0, goppar: 28.5, coutChambre: 62, directeur: "Marc Dupont", tel: "03 87 66 74 22", equip: ["PDJ inclus","Bar","Wifi","Parking"], certif: ["Clef Verte"], segment: "3*" },
-        { id: 4, name: "Campanile Metz", lat: 49.0912, lng: 6.1534, chambres: 75, etoiles: 3, ca: 1680, to: 71, adr: 86, revpar: 61.1, goppar: 20.8, coutChambre: 55, directeur: "Nathalie Leroy", tel: "03 87 63 91 00", equip: ["Restaurant","Parking","Wifi"], certif: [], segment: "3*" },
-        { id: 5, name: "Ibis Budget Metz", lat: 49.0834, lng: 6.1623, chambres: 82, etoiles: 2, ca: 1300, to: 72, adr: 60, revpar: 43.2, goppar: 18.2, coutChambre: 38, directeur: "Thomas Petit", tel: "08 92 68 07 81", equip: ["Parking","Wifi"], certif: [], segment: "2*" },
-        { id: 6, name: "Campanile Jouy-aux-Arches", lat: 49.0612, lng: 6.0789, chambres: 59, etoiles: 3, ca: 1000, to: 65, adr: 71, revpar: 46.2, goppar: 15.6, coutChambre: 48, directeur: "Claire Moreau", tel: "03 87 36 56 10", equip: ["Restaurant","Parking","Wifi"], certif: [], segment: "3*" },
-        { id: 7, name: "Première Classe Jouy", lat: 49.0623, lng: 6.0756, chambres: 71, etoiles: 1, ca: 620, to: 63, adr: 38, revpar: 23.9, goppar: 8.2, coutChambre: 28, directeur: "Pierre Garnier", tel: "03 87 36 58 20", equip: ["Parking","Wifi"], certif: [], segment: "1*" },
-        { id: 8, name: "B&B Thionville", lat: 49.3567, lng: 6.1678, chambres: 76, etoiles: 3, ca: 1500, to: 70, adr: 77, revpar: 53.9, goppar: 19.4, coutChambre: 45, directeur: "Julie Renard", tel: "08 92 78 29 29", equip: ["Parking","Wifi","PDJ buffet"], certif: [], segment: "3*" },
-        { id: 9, name: "Ibis Styles Châlons", lat: 48.9567, lng: 4.3634, chambres: 70, etoiles: 3, ca: 2250, to: 75, adr: 117, revpar: 87.8, goppar: 31.2, coutChambre: 65, directeur: "Antoine Richard", tel: "03 26 65 60 60", equip: ["PDJ inclus","Bar","Parking","Wifi","Séminaires"], certif: ["Clef Verte"], segment: "3*" },
-        { id: 10, name: "Ibis Châlons", lat: 48.9589, lng: 4.3612, chambres: 43, etoiles: 3, ca: 1170, to: 72, adr: 103, revpar: 74.2, goppar: 26.8, coutChambre: 56, directeur: "Émilie Fournier", tel: "03 26 65 16 65", equip: ["Bar","Parking","Wifi"], certif: [], segment: "3*" },
-        { id: 11, name: "Ibis Styles Sarrebourg", lat: 48.7345, lng: 7.0534, chambres: 48, etoiles: 3, ca: 1080, to: 68, adr: 91, revpar: 61.9, goppar: 22.5, coutChambre: 52, directeur: "François Muller", tel: "03 87 03 55 55", equip: ["PDJ inclus","Parking","Wifi"], certif: [], segment: "3*" },
-        { id: 12, name: "Ibis Budget Sarrebourg", lat: 48.7323, lng: 7.0567, chambres: 61, etoiles: 2, ca: 850, to: 66, adr: 58, revpar: 38.3, goppar: 14.8, coutChambre: 35, directeur: "François Muller", tel: "03 87 03 90 90", equip: ["Parking","Wifi"], certif: [], segment: "2*" },
-        { id: 13, name: "Ibis Budget Forbach", lat: 49.1845, lng: 6.9012, chambres: 71, etoiles: 2, ca: 700, to: 61, adr: 44, revpar: 26.8, goppar: 10.2, coutChambre: 32, directeur: "Yannick Weber", tel: "08 92 68 09 17", equip: ["Parking","Wifi"], certif: [], segment: "2*" },
-        { id: 14, name: "Première Classe Freyming", lat: 49.1456, lng: 6.7923, chambres: 71, etoiles: 1, ca: 490, to: 58, adr: 33, revpar: 19.1, goppar: 6.4, coutChambre: 24, directeur: "Yannick Weber", tel: "03 87 81 33 00", equip: ["Parking","Wifi"], certif: [], segment: "1*" }
-    ];
+const H_NON_EXPL=[
+    {id:16,n:"B&B Castres",v:"Castres (Tarn)",lat:43.6045,lng:2.2419,ch:75,e:2,prop:"Murs",liv:"Avril 2016",expl:"B&B Hotels",surf:3000},
+    {id:17,n:"B&B Lyon Tassin",v:"Tassin-la-Demi-Lune",lat:45.7640,lng:4.7620,ch:102,e:2,prop:"Murs",liv:"Déc. 2015",expl:"B&B Hotels",surf:2080}
+];
 
-    const MONTHLY_CA_BUDGET = [
-        { mois: "Jan", ca: 1450, budget: 1500 },
-        { mois: "Fév", ca: 1380, budget: 1400 },
-        { mois: "Mar", ca: 1620, budget: 1600 },
-        { mois: "Avr", ca: 1750, budget: 1700 },
-        { mois: "Mai", ca: 1890, budget: 1800 },
-        { mois: "Jun", ca: 2150, budget: 2000 },
-        { mois: "Jul", ca: 2380, budget: 2200 },
-        { mois: "Aoû", ca: 2250, budget: 2100 },
-        { mois: "Sep", ca: 2050, budget: 1950 },
-        { mois: "Oct", ca: 1820, budget: 1800 },
-        { mois: "Nov", ca: 1580, budget: 1600 },
-        { mois: "Déc", ca: 2180, budget: 1850 }
-    ];
+const PIPELINE=[
+    {id:15,n:"Hôtel La Comédie",v:"Metz",lat:49.1198,lng:6.1752,ch:54,e:4,caP:3800,stat:"En rénovation",ech:"Courant 2026"},
+    {id:"11b",n:"Extension Ibis Châlons",v:"Châlons",lat:48.9580,lng:4.3625,ch:22,caP:520,stat:"Planifié",ech:"Q2 2026"}
+];
 
-    const SEGMENTS = [
-        { name: "3 étoiles", value: 58, color: "#1e3a5f" },
-        { name: "2 étoiles", value: 21, color: "#d4a853" },
-        { name: "4 étoiles", value: 11, color: "#10b981" },
-        { name: "1 étoile", value: 10, color: "#94a3b8" }
-    ];
+// ========== Daily data generation with seasonality ==========
+const TODAY=new Date();const JFR=["Dim","Lun","Mar","Mer","Jeu","Ven","Sam"];const MFR=["Jan","Fév","Mar","Avr","Mai","Jun","Jul","Aoû","Sep","Oct","Nov","Déc"];
 
-    const TREASURY_DATA = [
-        { mois: "Jan", solde: 1680, encTotal: 1450, decTotal: 1570, encHeb: 1200, encFB: 180, encAutres: 70, decSal: 680, decFourn: 280, decCharges: 220, decEmprunts: 190, decInvest: 200 },
-        { mois: "Fév", solde: 1420, encTotal: 1370, decTotal: 1630, encHeb: 1150, encFB: 160, encAutres: 60, decSal: 680, decFourn: 260, decCharges: 215, decEmprunts: 190, decInvest: 285 },
-        { mois: "Mar", solde: 1560, encTotal: 1625, decTotal: 1485, encHeb: 1350, encFB: 200, encAutres: 75, decSal: 695, decFourn: 300, decCharges: 225, decEmprunts: 190, decInvest: 75 },
-        { mois: "Avr", solde: 1890, encTotal: 1780, decTotal: 1450, encHeb: 1480, encFB: 220, encAutres: 80, decSal: 695, decFourn: 320, decCharges: 230, decEmprunts: 190, decInvest: 15 },
-        { mois: "Mai", solde: 2280, encTotal: 1915, decTotal: 1525, encHeb: 1580, encFB: 250, encAutres: 85, decSal: 710, decFourn: 350, decCharges: 235, decEmprunts: 190, decInvest: 40 },
-        { mois: "Jun", solde: 2790, encTotal: 2170, decTotal: 1660, encHeb: 1800, encFB: 280, encAutres: 90, decSal: 710, decFourn: 380, decCharges: 240, decEmprunts: 190, decInvest: 140 },
-        { mois: "Jul", solde: 3380, encTotal: 2395, decTotal: 1805, encHeb: 2000, encFB: 300, encAutres: 95, decSal: 725, decFourn: 400, decCharges: 245, decEmprunts: 190, decInvest: 245 },
-        { mois: "Aoû", solde: 3850, encTotal: 2260, decTotal: 1790, encHeb: 1880, encFB: 290, encAutres: 90, decSal: 725, decFourn: 390, decCharges: 240, decEmprunts: 190, decInvest: 245 },
-        { mois: "Sep", solde: 3520, encTotal: 2045, decTotal: 2375, encHeb: 1700, encFB: 260, encAutres: 85, decSal: 710, decFourn: 360, decCharges: 235, decEmprunts: 190, decInvest: 880 },
-        { mois: "Oct", solde: 3150, encTotal: 1830, decTotal: 2200, encHeb: 1520, encFB: 230, encAutres: 80, decSal: 710, decFourn: 330, decCharges: 230, decEmprunts: 190, decInvest: 740 },
-        { mois: "Nov", solde: 2870, encTotal: 1590, decTotal: 1870, encHeb: 1320, encFB: 200, encAutres: 70, decSal: 695, decFourn: 290, decCharges: 220, decEmprunts: 190, decInvest: 475 },
-        { mois: "Déc", solde: 3190, encTotal: 2195, decTotal: 1875, encHeb: 1820, encFB: 280, encAutres: 95, decSal: 720, decFourn: 380, decCharges: 245, decEmprunts: 190, decInvest: 340 }
-    ];
+const genDaily=()=>{
+    const mi=TODAY.getMonth(),ji=TODAY.getDay(),cM=SEASON.monthly[mi].c,cJ=SEASON.weekly[ji===0?6:ji-1].c,seed=TODAY.getDate()*17+mi*31;
+    const rnd=(a,b,s=0)=>a+((seed+s*7)%100)/100*(b-a);
+    return H.map(h=>{
+        const bTO=h.to/100,toD=Math.min(.98,bTO*cM*cJ*rnd(.88,1.12,h.id)),adrD=h.adr*rnd(.92,1.08,h.id+50);
+        const chV=Math.round(h.ch*toD),caD=chV*adrD/1000,pk7=Math.round(h.ch*bTO*cM*rnd(.5,.85,h.id+100)),pk30=Math.round(h.ch*bTO*cM*rnd(.3,.6,h.id+200));
+        return{id:h.id,n:h.n,ch:h.ch,e:h.e,toD:Math.round(toD*100),adrD:Math.round(adrD),chV,chDi:h.ch-chV,caD:Math.round(caD*10)/10,rpD:Math.round(adrD*toD*100)/100,pk7,pk30,st:toD>.8?"Excellent":toD>.65?"Bon":toD>.5?"Moyen":"Faible"};
+    });
+};
 
-    const IMMOBILIER = {
-        surface: 22496,
-        valeur: 41400,
-        loyersNets: 3200,
-        tauxCap: 7.7,
-        ltv: 37,
-        dettes: 15300,
-        dscr: 149,
-        parType: [
-            { name: "Bureaux", value: 38, color: "#1e3a5f" },
-            { name: "Hôtels", value: 28, color: "#d4a853" },
-            { name: "Commerce", value: 11, color: "#10b981" },
-            { name: "Autre", value: 10, color: "#f59e0b" },
-            { name: "Logement", value: 7, color: "#8b5cf6" },
-            { name: "Dépôt", value: 6, color: "#94a3b8" }
-        ],
-        parClient: [
-            { name: "Grands Groupes", value: 34, color: "#1e3a5f" },
-            { name: "Sociétés cotées", value: 24, color: "#d4a853" },
-            { name: "Intra groupe", value: 16, color: "#10b981" },
-            { name: "Clients pro", value: 9, color: "#f59e0b" },
-            { name: "État", value: 8, color: "#8b5cf6" },
-            { name: "Vacants", value: 4, color: "#ef4444" }
-        ]
-    };
+const genHeatmap=()=>{
+    const data=[];
+    for(let d=-3;d<=3;d++){
+        const dt=new Date(TODAY);dt.setDate(dt.getDate()+d);
+        const ji=dt.getDay(),cJ=SEASON.weekly[ji===0?6:ji-1].c,cM=SEASON.monthly[dt.getMonth()].c;
+        const row={jour:JFR[ji],date:dt.getDate()+"/"+(dt.getMonth()+1),isToday:d===0,vals:{}};
+        H.forEach(h=>{const seed=dt.getDate()*13+h.id*7;row.vals[h.id]=Math.min(98,Math.round(h.to*cJ*cM*(.9+((seed%20)/100))));});
+        data.push(row);
+    }
+    return data;
+};
 
-    const BUDGET_2026 = {
-        revenus: {
-            total: 23480,
-            hebergement: { total: 20300, details: [
-                { label: "Chambres", montant: 18200 },
-                { label: "Petits-déjeuners", montant: 1400 },
-                { label: "Late checkout", montant: 350 },
-                { label: "No-show", montant: 200 },
-                { label: "Surclassements", montant: 100 },
-                { label: "Packages", montant: 50 }
-            ]},
-            fb: { total: 2630, details: [
-                { label: "Restaurant", montant: 1800 },
-                { label: "Bar", montant: 650 },
-                { label: "Room service", montant: 180 }
-            ]},
-            autres: { total: 550, details: [
-                { label: "Parking", montant: 280 },
-                { label: "Séminaires", montant: 180 },
-                { label: "Divers", montant: 90 }
-            ]}
-        },
-        charges: {
-            total: 16855,
-            details: [
-                { label: "Personnel", montant: 9180, pct: 54.5 },
-                { label: "Exploitation", montant: 2490, pct: 14.8 },
-                { label: "Commercial", montant: 1530, pct: 9.1 },
-                { label: "Franchise", montant: 1760, pct: 10.4 },
-                { label: "Administration", montant: 980, pct: 5.8 },
-                { label: "Financier", montant: 915, pct: 5.4 }
-            ]
-        },
-        capex: {
-            total: 2000,
-            details: [
-                { label: "Rénovations chambres", montant: 800 },
-                { label: "Équipements F&B", montant: 400 },
-                { label: "IT / PMS", montant: 300 },
-                { label: "Mobilier", montant: 300 },
-                { label: "Divers", montant: 200 }
-            ]
-        },
-        gop: 5050,
-        resultatNet: 4135
-    };
+const DAILY=genDaily();
+const HEATMAP=genHeatmap();
 
-    const ROADMAP = [
-        { id: 1, nom: "Ibis Styles Metz Centre", type: "Construction", budget: 8500, depense: 6800, progress: 80, responsable: "Brice Curti", echeance: "Fin 2025", risque: null, statut: "En cours" },
-        { id: 2, nom: "Hôtel La Comédie 4*", type: "Rénovation", budget: 12000, depense: 4200, progress: 35, responsable: "Brice Curti", echeance: "Courant 2026", risque: "Retard fournitures", statut: "En cours" },
-        { id: 3, nom: "Extension Ibis Châlons", type: "Extension", budget: 2800, depense: 0, progress: 0, responsable: "—", echeance: "Q2 2026", risque: null, statut: "Planifié" },
-        { id: 4, nom: "Rénovation PC Freyming", type: "Rénovation", budget: 1200, depense: 0, progress: 0, responsable: "—", echeance: "Q3 2026", risque: null, statut: "Planifié" },
-        { id: 5, nom: "PMS unifié", type: "IT", budget: 450, depense: 279, progress: 62, responsable: "Guillaume Gervasoni", echeance: "Q1 2026", risque: "Formation équipes", statut: "En cours" },
-        { id: 6, nom: "Certifications Clef Verte", type: "RSE", budget: 80, depense: 45, progress: 56, responsable: "Tristan Abisse", echeance: "Q2 2026", risque: null, statut: "En cours" },
-        { id: 7, nom: "Dashboards Power BI", type: "IT", budget: 120, depense: 0, progress: 0, responsable: "—", echeance: "Q1 2026", risque: null, statut: "Planifié" },
-        { id: 8, nom: "Acquisition Nancy", type: "Acquisition", budget: 6500, depense: 975, progress: 15, responsable: "André Heintz", echeance: "2026", risque: "Financement, concurrence", statut: "Étude" }
-    ];
+// ========== Monthly CA/Budget with N-1 ==========
+const MCB=[
+    {m:"Jan",ca:1450,bg:1500,n1:1320},{m:"Fév",ca:1380,bg:1400,n1:1290},{m:"Mar",ca:1620,bg:1600,n1:1480},
+    {m:"Avr",ca:1750,bg:1700,n1:1590},{m:"Mai",ca:1890,bg:1800,n1:1720},{m:"Jun",ca:2150,bg:2000,n1:1950},
+    {m:"Jul",ca:2380,bg:2200,n1:2100},{m:"Aoû",ca:2250,bg:2100,n1:2020},{m:"Sep",ca:2050,bg:1950,n1:1870},
+    {m:"Oct",ca:1820,bg:1800,n1:1680},{m:"Nov",ca:1580,bg:1600,n1:1450},{m:"Déc",ca:2180,bg:1850,n1:1960}
+];
 
-    // =====================================================
-    // UTILITIES
-    // =====================================================
+const SEG_REEL=[{name:"3★",value:44.4,color:"#1e3a5f"},{name:"2★",value:31.1,color:"#d4a853"},{name:"4★",value:13.2,color:"#10b981"},{name:"1★",value:11.3,color:"#94a3b8"}];
 
-    const fmt = (n, decimals = 0) => {
-        if (n === undefined || n === null) return "—";
-        return new Intl.NumberFormat('fr-FR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals }).format(n);
-    };
+// ========== Treasury ==========
+const TRES=[
+    {m:"Jan",sol:1680,enc:1450,dec:1570,eH:1200,eF:180,eA:70,dS:680,dFo:280,dC:220,dE:190,dI:200},
+    {m:"Fév",sol:1420,enc:1370,dec:1630,eH:1150,eF:160,eA:60,dS:680,dFo:260,dC:215,dE:190,dI:285},
+    {m:"Mar",sol:1560,enc:1625,dec:1485,eH:1350,eF:200,eA:75,dS:695,dFo:300,dC:225,dE:190,dI:75},
+    {m:"Avr",sol:1890,enc:1780,dec:1450,eH:1480,eF:220,eA:80,dS:695,dFo:320,dC:230,dE:190,dI:15},
+    {m:"Mai",sol:2280,enc:1915,dec:1525,eH:1580,eF:250,eA:85,dS:710,dFo:350,dC:235,dE:190,dI:40},
+    {m:"Jun",sol:2790,enc:2170,dec:1660,eH:1800,eF:280,eA:90,dS:710,dFo:380,dC:240,dE:190,dI:140},
+    {m:"Jul",sol:3380,enc:2395,dec:1805,eH:2000,eF:300,eA:95,dS:725,dFo:400,dC:245,dE:190,dI:245},
+    {m:"Aoû",sol:3850,enc:2260,dec:1790,eH:1880,eF:290,eA:90,dS:725,dFo:390,dC:240,dE:190,dI:245},
+    {m:"Sep",sol:3520,enc:2045,dec:2375,eH:1700,eF:260,eA:85,dS:710,dFo:360,dC:235,dE:190,dI:880},
+    {m:"Oct",sol:3150,enc:1830,dec:2200,eH:1520,eF:230,eA:80,dS:710,dFo:330,dC:230,dE:190,dI:740},
+    {m:"Nov",sol:2870,enc:1590,dec:1870,eH:1320,eF:200,eA:70,dS:695,dFo:290,dC:220,dE:190,dI:475},
+    {m:"Déc",sol:3190,enc:2195,dec:1875,eH:1820,eF:280,eA:95,dS:720,dFo:380,dC:245,dE:190,dI:340}
+];
 
-    const fmtK = (n) => fmt(n) + " K€";
-    const fmtM = (n) => (n / 1000).toFixed(1).replace('.', ',') + " M€";
-    const fmtPct = (n) => fmt(n, 1) + " %";
-    const fmtEur = (n) => fmt(n) + " €";
+// ========== Immobilier — corrigé plaquette 16/09/2025 ==========
+const IMM={
+    surf:22496,val:41400,loyB:3400,loyN:3200,txC:7.3,ltv:37,det:15300,dscr:149,remb:2100,
+    pTyp:[{n:"Bureaux",v:38,c:"#1e3a5f"},{n:"Hôtels",v:28,c:"#d4a853"},{n:"Commerce",v:11,c:"#10b981"},{n:"Autre",v:10,c:"#f59e0b"},{n:"Logement",v:7,c:"#8b5cf6"},{n:"Dépôt",v:6,c:"#94a3b8"}],
+    pCli:[{n:"Grands Groupes",v:34,c:"#1e3a5f"},{n:"Sociétés cotées",v:24,c:"#d4a853"},{n:"Intra groupe",v:16,c:"#10b981"},{n:"Clients pro",v:9,c:"#f59e0b"},{n:"État",v:8,c:"#8b5cf6"},{n:"Vacants",v:4,c:"#ef4444"}],
+    pLoc:[{n:"Metz",v:56,c:"#1e3a5f"},{n:"France hors Metz/Moselle",v:33,c:"#d4a853"},{n:"Moselle hors Metz",v:11,c:"#10b981"}],
+    actifs:[
+        {l:"Forbach",t:"Cellule commerciale",s:127,loc:"En cours de location",a:"Nov. 2015"},
+        {l:"Forbach",t:"Cellule commerciale",s:480,loc:"En cours de location",a:"2004"},
+        {l:"Metz",t:"Immeuble bureaux",s:700,loc:"La Semaine, Europe 2, Mamytwink",a:"2025"},
+        {l:"Metz",t:"Bureaux Pôle Emploi",s:1630,loc:"Pôle Emploi + 58 parkings",a:"Fév. 2009"},
+        {l:"Metz",t:"Habitation",s:520,loc:"Particuliers",a:"Avr. 2022"},
+        {l:"Metz",t:"Commerce pied d'immeuble",s:420,loc:"Tertiaire",a:"Avr. 2022"},
+        {l:"Metz",t:"Commerce",s:142,loc:"Salon de coiffure",a:"Nov. 2022"},
+        {l:"Metz",t:"Parking & boxes",s:0,loc:"En cours",a:"Juin 2021"},
+        {l:"Metz",t:"Bureaux HIH",s:687,loc:"HIH Développement",a:"Oct. 2022"},
+        {l:"Metz Amphithéâtre",t:"4 cellules commerce",s:478,loc:"Restaurants, mutuelle",a:"Déc. 2013"},
+        {l:"Ars-Laquenexy",t:"Bureaux SPIE",s:2454,loc:"SPIE + 150 parkings",a:"Nov. 2022"},
+        {l:"Jouy-aux-Arches",t:"Co-bureaux LE 45",s:1920,loc:"28 PME",a:"2016"},
+        {l:"Jouy-aux-Arches",t:"Entrepôts SPIE",s:3400,loc:"SPIE + 12 000 m² terrain",a:"2016"},
+        {l:"Manom",t:"Tertiaire",s:1200,loc:"Pôle Emploi, intérim",a:"Avr. 2014"},
+        {l:"Sarreguemines",t:"Halle SERNAM",s:1300,loc:"PJJ, SPIP",a:"Sept. 2012"},
+        {l:"Châlons",t:"Commerce",s:204,loc:"Mutuelle",a:"2017"},
+        {l:"Tassin",t:"Hôtel B&B",s:2080,loc:"B&B Hotels 102 ch.",a:"Déc. 2015"},
+        {l:"Castres",t:"Hôtel B&B + commerce",s:3000,loc:"B&B Hotels 77 ch.",a:"Avr. 2016"}
+    ]
+};
 
-    const exportToExcel = (data, filename, sheetName = "Export") => {
-        const ws = XLSX.utils.json_to_sheet(data);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, sheetName);
-        XLSX.utils.sheet_add_aoa(ws, [], { origin: -1 });
-        const colWidths = Object.keys(data[0] || {}).map(k => ({ wch: Math.max(k.length + 2, 14) }));
-        ws['!cols'] = colWidths;
-        XLSX.writeFile(wb, filename + ".xlsx");
-    };
+// ========== Groupe consolidé ==========
+const GRP={
+    hot:{ca:21540,vMurs:61400,fComm:17600,tActifs:79000,det:36200,remb:3500,ltv:45.8,chExpl:1004,chTotal:1257},
+    imm:{ca:3400,val:41400,det:15300,remb:2100,ltv:37},
+    cons:{caT:24940,tActifs:120400,detT:51500,rembT:5600},
+    pipe:{ch:76,caP:4320,caM:3800},
+    evo:[{a:"2022",ca:16200},{a:"2023",ca:18100},{a:"2024",ca:19600},{a:"2025",ca:21540},{a:"2026P",ca:23480},{a:"2027P",ca:25860}]
+};
 
-    const etoilesStr = (n) => "★".repeat(n) + "☆".repeat(Math.max(0, 5 - n));
+// ========== Budget 2026 ==========
+const BDG={
+    rev:{t:23480,heb:{t:20300,d:[{l:"Chambres",m:18200},{l:"Petits-déjeuners",m:1400},{l:"Late checkout",m:350},{l:"No-show",m:200},{l:"Surclassements",m:100},{l:"Packages",m:50}]},fb:{t:2630,d:[{l:"Restaurant",m:1800},{l:"Bar",m:650},{l:"Room service",m:180}]},aut:{t:550,d:[{l:"Parking",m:280},{l:"Séminaires",m:180},{l:"Divers",m:90}]}},
+    chg:{t:16855,d:[{l:"Personnel",m:9180,p:54.5},{l:"Exploitation",m:2490,p:14.8},{l:"Commercial",m:1530,p:9.1},{l:"Franchise",m:1760,p:10.4},{l:"Administration",m:980,p:5.8},{l:"Financier",m:915,p:5.4}]},
+    cpx:{t:2000,d:[{l:"Rénovations chambres",m:800},{l:"Équipements F&B",m:400},{l:"IT / PMS",m:300},{l:"Mobilier",m:300},{l:"Divers",m:200}]},
+    gop:5050,rn:4135
+};
 
-    // =====================================================
-    // ICONS (inline SVG)
-    // =====================================================
+// ========== Roadmap ==========
+const RDM=[
+    {id:1,nom:"Ibis Styles Metz Centre",typ:"Construction",bud:8500,dep:6800,prg:80,resp:"Brice Curti",ech:"Fin 2025",rsk:null,st:"En cours",ch:86,caP:2400},
+    {id:2,nom:"Hôtel La Comédie 4*",typ:"Rénovation",bud:12000,dep:4200,prg:35,resp:"Brice Curti",ech:"Courant 2026",rsk:"Retard fournitures",st:"En cours",ch:54,caP:3800},
+    {id:3,nom:"Extension Ibis Châlons",typ:"Extension",bud:2800,dep:0,prg:0,resp:"—",ech:"Q2 2026",rsk:null,st:"Planifié",ch:22,caP:520},
+    {id:4,nom:"Rénovation PC Freyming",typ:"Rénovation",bud:1200,dep:0,prg:0,resp:"—",ech:"Q3 2026",rsk:null,st:"Planifié",ch:71,caP:null},
+    {id:5,nom:"PMS unifié",typ:"IT",bud:450,dep:279,prg:62,resp:"Guillaume Gervasoni",ech:"Q1 2026",rsk:"Formation équipes",st:"En cours",ch:null,caP:null},
+    {id:6,nom:"Certifications Clef Verte",typ:"RSE",bud:80,dep:45,prg:56,resp:"Tristan Abisse",ech:"Q2 2026",rsk:null,st:"En cours",ch:null,caP:null},
+    {id:7,nom:"Dashboards Power BI",typ:"IT",bud:120,dep:0,prg:0,resp:"—",ech:"Q1 2026",rsk:null,st:"Planifié",ch:null,caP:null},
+    {id:8,nom:"Acquisition Nancy",typ:"Acquisition",bud:6500,dep:975,prg:15,resp:"André Heintz",ech:"2026",rsk:"Financement, concurrence",st:"Étude",ch:null,caP:null}
+];
 
-    const Icons = {
-        globe: <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>,
-        cash: <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" /></svg>,
-        hotel: <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>,
-        building: <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" /></svg>,
-        budget: <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>,
-        map: <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" /></svg>,
-        roadmap: <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>,
-        download: <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>,
-        up: <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg>,
-        down: <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>,
-        alert: <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.832c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" /></svg>
-    };
+// ========== Organigramme ==========
+const ORG={
+    dir:[{n:"André Heintz",p:"Fondateur"},{n:"Christophe Thiriet",p:"Co-Fondateur"}],
+    sup:[{n:"Kim Souty",p:"Assistante de direction"},{n:"Marie Leclairée",p:"Secrétaire"},{n:"Coralie Cesario",p:"Conciergerie"}],
+    dep:[
+        {nm:"Immobilier",r:"Angélique Aniel",p:"Resp. organisation et projets",eq:[{n:"Florence Schaeffer",p:"Gestionnaire immo. locatif"}],col:"#1e3a5f"},
+        {nm:"Hôtellerie",r:"Ludovic de Monteclain",p:"Dir. opérations hôtelières",eq:[{n:"Sylvie Jodel",p:"Commerciale Hôtels"}],col:"#d4a853"},
+        {nm:"Ressources Humaines",r:"Audrey Aubry",p:"Directrice RH",eq:[{n:"Camille Lachaise",p:"Gestionnaire RH"},{n:"Julie Hénault",p:"Gestionnaire RH"}],col:"#8b5cf6"},
+        {nm:"Juridique",r:"Poste à pourvoir",p:"Juriste droit des sociétés",eq:[],col:"#94a3b8"},
+        {nm:"Comptabilité & Finance",r:"Christine Bastien",p:"Resp. comptabilité",eq:[{n:"Sophie Cholewa",p:"Réviseur"},{n:"Alexis Pauly",p:"Asst. réviseur"},{n:"Saban Sivri",p:"Compta invest."},{n:"Audrey Faure",p:"Comptable"},{n:"Sasha Titren",p:"Comptable"},{n:"Renée Konter",p:"Comptable"},{n:"Marie Pinthon",p:"Comptable"},{n:"Eva Casella",p:"Apprentie"}],col:"#ef4444"},
+        {nm:"Contrôle de Gestion",r:"Jérôme SCAT",p:"Contrôleur de Gestion",eq:[],col:"#10b981",isNew:true},
+        {nm:"Communication",r:"Sandrine Bondon",p:"Resp. communication",eq:[],col:"#f59e0b"},
+        {nm:"RSE",r:"Tristan Abisse",p:"Responsable RSE",eq:[],col:"#059669"},
+        {nm:"Systèmes d'Information",r:"Guillaume Gervasoni",p:"Resp. informatique",eq:[],col:"#3b82f6"},
+        {nm:"Travaux & Agencements",r:"Brice Curti",p:"Dir. technique et travaux",eq:[{n:"Anaïs Lavarino",p:"Assistante"},{n:"Sandra Laheurte",p:"Resp. maintenance"},{n:"David Corbier",p:"Resp. travaux"},{n:"Sylvain Rémy",p:"Resp. technique"},{n:"Stefano Rubortone",p:"Resp. conception"}],col:"#78350f"}
+    ]
+};
 
-    // =====================================================
-    // REUSABLE COMPONENTS
-    // =====================================================
+// ========== Forecasting ==========
+const genForecast=()=>{
+    const cm=TODAY.getMonth();
+    const ytdCA=MCB.slice(0,cm+1).reduce((s,m)=>s+m.ca,0);
+    const ytdBG=MCB.slice(0,cm+1).reduce((s,m)=>s+m.bg,0);
+    const ratio=ytdCA/ytdBG;
+    const fc=MCB.map((m,i)=>{
+        if(i<=cm)return{...m,typ:"réel",fc:m.ca};
+        const base=m.bg*ratio;return{...m,typ:"prévision",fc:Math.round(base),fcO:Math.round(base*1.05),fcP:Math.round(base*.93)};
+    });
+    return{fc,ytdCA,ytdBG,ratio,tFC:fc.reduce((s,m)=>s+(m.fc||m.ca),0),tO:fc.reduce((s,m)=>s+(m.fcO||m.ca),0),tP:fc.reduce((s,m)=>s+(m.fcP||m.ca),0)};
+};
+const FC=genForecast();
 
-    const KPICard = ({ label, value, unit, trend, trendLabel, color = "primary", icon }) => {
-        const colorMap = {
-            primary: "border-l-primary",
-            secondary: "border-l-secondary",
-            success: "border-l-success",
-            warning: "border-l-warning",
-            danger: "border-l-danger"
-        };
-        const trendColor = trend > 0 ? "text-success" : trend < 0 ? "text-danger" : "text-muted";
-        return (
-            <div className={`kpi-card bg-white rounded-xl p-5 shadow-sm border-l-4 ${colorMap[color] || colorMap.primary}`}>
-                <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-muted">{label}</span>
-                    {icon && <span className="text-muted opacity-50">{icon}</span>}
-                </div>
-                <div className="flex items-baseline gap-1">
-                    <span className="text-2xl font-bold text-gray-900">{value}</span>
-                    {unit && <span className="text-sm text-muted">{unit}</span>}
-                </div>
-                {(trend !== undefined && trend !== null) && (
-                    <div className={`flex items-center gap-1 mt-2 text-xs font-medium ${trendColor}`}>
-                        {trend > 0 ? Icons.up : trend < 0 ? Icons.down : null}
-                        <span>{trend > 0 ? "+" : ""}{typeof trend === 'number' ? trend.toFixed(1) : trend}{trendLabel || ""}</span>
-                    </div>
-                )}
-            </div>
-        );
-    };
+// ========== Utilities ==========
+const fmt=(n,d=0)=>{if(n==null)return"—";return new Intl.NumberFormat('fr-FR',{minimumFractionDigits:d,maximumFractionDigits:d}).format(n)};
+const fK=n=>fmt(n)+" K€";const fM=n=>(n/1000).toFixed(1).replace('.',',')+" M€";const fP=(n,d=1)=>fmt(n,d)+"%";const fE=n=>fmt(n)+" €";
 
-    const StatusBadge = ({ statut }) => {
-        const styles = {
-            "En cours": "bg-blue-100 text-blue-700",
-            "Planifié": "bg-gray-100 text-gray-600",
-            "Étude": "bg-purple-100 text-purple-700",
-            "Terminé": "bg-green-100 text-green-700",
-            "Confort": "bg-green-100 text-green-700",
-            "Vigilance": "bg-orange-100 text-orange-700",
-            "Critique": "bg-red-100 text-red-700"
-        };
-        return <span className={`status-badge ${styles[statut] || "bg-gray-100 text-gray-600"}`}>{statut}</span>;
-    };
+const xls=(data,fn,sn="Export")=>{const ws=XLSX.utils.json_to_sheet(data);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,sn);ws['!cols']=Object.keys(data[0]||{}).map(k=>({wch:Math.max(k.length+2,14)}));XLSX.writeFile(wb,fn+".xlsx")};
 
-    const ExportButton = ({ onClick, label = "Export Excel" }) => (
-        <button onClick={onClick} className="export-btn flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-opacity-90">
-            {Icons.download}
-            {label}
-        </button>
-    );
+// ========== Icons ==========
+const Ic={
+    globe:<svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>,
+    cash:<svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>,
+    htl:<svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>,
+    bld:<svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"/></svg>,
+    calc:<svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>,
+    map:<svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>,
+    clip:<svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>,
+    usr:<svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>,
+    sun:<svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>,
+    grp:<svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/></svg>,
+    chrt:<svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>,
+    dl:<svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>,
+    up:<svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>,
+    dn:<svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>,
+    wrn:<svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.832c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+};
 
-    const SectionTitle = ({ children, right }) => (
-        <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-gray-900">{children}</h2>
-            {right}
+// ========== Shared Components ==========
+const KPI=({label,value,unit,trend,tl,color="primary",icon})=>{
+    const cm={primary:"border-l-primary",secondary:"border-l-secondary",success:"border-l-success",warning:"border-l-warning",danger:"border-l-danger"};
+    const tc=trend>0?"text-success":trend<0?"text-danger":"text-muted";
+    return(<div className={"kpi-card bg-white rounded-xl p-4 shadow-sm border-l-4 "+(cm[color]||cm.primary)}>
+        <div className="flex items-center justify-between mb-1"><span className="text-xs font-medium text-muted">{label}</span>{icon&&<span className="text-muted opacity-40">{icon}</span>}</div>
+        <div className="flex items-baseline gap-1"><span className="text-xl font-bold text-gray-900">{value}</span>{unit&&<span className="text-xs text-muted">{unit}</span>}</div>
+        {(trend!=null)&&<div className={"flex items-center gap-1 mt-1 text-xs font-medium "+tc}>{trend>0?Ic.up:trend<0?Ic.dn:null}<span>{trend>0?"+":""}{typeof trend==='number'?trend.toFixed(1):trend}{tl||""}</span></div>}
+    </div>);
+};
+const Bdg=({statut})=>{const s={"En cours":"bg-blue-100 text-blue-700","Planifié":"bg-gray-100 text-gray-600","Étude":"bg-purple-100 text-purple-700","Confort":"bg-green-100 text-green-700","Vigilance":"bg-orange-100 text-orange-700","Critique":"bg-red-100 text-red-700","Excellent":"bg-green-100 text-green-700","Bon":"bg-blue-100 text-blue-700","Moyen":"bg-orange-100 text-orange-700","Faible":"bg-red-100 text-red-700"};return <span className={"status-badge "+(s[statut]||"bg-gray-100 text-gray-600")}>{statut}</span>};
+const XBtn=({onClick,label="Export"})=><button onClick={onClick} className="export-btn flex items-center gap-2 px-3 py-1.5 bg-primary text-white rounded-lg text-xs font-medium hover:bg-opacity-90">{Ic.dl}{label}</button>;
+const Sec=({children,right})=><div className="flex items-center justify-between mb-3"><h3 className="text-base font-bold text-gray-900">{children}</h3>{right}</div>;
+const CTip=({active,payload,label})=>{if(!active||!payload)return null;return(<div className="bg-white p-2.5 rounded-lg shadow-lg border border-gray-100 text-xs"><p className="font-semibold text-gray-900 mb-1">{label}</p>{payload.map((p,i)=><p key={i} style={{color:p.color}} className="flex justify-between gap-3"><span>{p.name}</span><span className="font-medium">{fmt(p.value)} K€</span></p>)}</div>)};
+
+// ========== TABS ==========
+const TABS=[
+    {id:"daily",label:"Journalier",icon:Ic.sun},
+    {id:"groupe",label:"Groupe",icon:Ic.grp},
+    {id:"global",label:"Vue Globale",icon:Ic.globe},
+    {id:"tresorerie",label:"Trésorerie",icon:Ic.cash},
+    {id:"hotellerie",label:"Hôtelière",icon:Ic.htl},
+    {id:"couts",label:"Coûts",icon:Ic.chrt},
+    {id:"immobilier",label:"Immobilière",icon:Ic.bld},
+    {id:"budget",label:"Budget 2026",icon:Ic.calc},
+    {id:"etablissements",label:"Carte",icon:Ic.map},
+    {id:"roadmap",label:"Roadmap",icon:Ic.clip},
+    {id:"organigramme",label:"Équipe",icon:Ic.usr}
+];
+
+const Nav=({tab,set})=>(
+    <nav className="sticky top-0 z-40 bg-white shadow-sm border-b border-gray-200 no-print">
+        <div className="max-w-7xl mx-auto"><div className="nav-scroll flex">
+            {TABS.map(t=><button key={t.id} onClick={()=>set(t.id)} className={"nav-tab flex items-center gap-1.5 px-3 py-2.5 text-xs whitespace-nowrap "+(tab===t.id?'active':'text-muted border-b-transparent')}>{t.icon}<span className="hidden md:inline">{t.label}</span></button>)}
+        </div></div>
+    </nav>
+);
+
+const COLS=["#1e3a5f","#d4a853","#10b981","#f59e0b","#8b5cf6","#94a3b8","#ef4444","#06b6d4"];
+
+// ===== 1. DAILY PAGE =====
+const DailyPage=()=>{
+    const totCH=DAILY.reduce((s,d)=>s+d.ch,0),totCV=DAILY.reduce((s,d)=>s+d.chV,0);
+    const avgTO=Math.round(totCV/totCH*100),avgADR=Math.round(DAILY.reduce((s,d)=>s+d.adrD,0)/DAILY.length);
+    const avgRP=Math.round(avgADR*avgTO/100),totCA=DAILY.reduce((s,d)=>s+d.caD,0).toFixed(1);
+    const mi=TODAY.getMonth(),ji=TODAY.getDay(),sm=SEASON.monthly[mi],sj=SEASON.weekly[ji===0?6:ji-1];
+    const alerts=DAILY.filter(d=>d.toD<55),warns=DAILY.filter(d=>d.toD>=55&&d.toD<65);
+    return(<div className="slide-enter space-y-6">
+        <div className="flex flex-wrap items-center gap-3">
+            <span className="live-dot"></span>
+            <span className="text-sm font-semibold text-gray-700">{TODAY.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</span>
+            <span className="text-xs text-muted bg-gray-100 px-2 py-1 rounded-full">Saisonnalité : {sm.l} ({(sm.c>1?"+":"")+Math.round((sm.c-1)*100)}% mois) · {sj.j} ({(sj.c>1?"+":"")+Math.round((sj.c-1)*100)}% jour)</span>
         </div>
-    );
-
-    const CustomTooltip = ({ active, payload, label }) => {
-        if (!active || !payload) return null;
-        return (
-            <div className="bg-white p-3 rounded-lg shadow-lg border border-gray-100 text-sm">
-                <p className="font-semibold text-gray-900 mb-1">{label}</p>
-                {payload.map((p, i) => (
-                    <p key={i} style={{ color: p.color }} className="flex justify-between gap-4">
-                        <span>{p.name}</span>
-                        <span className="font-medium">{fmt(p.value)} K€</span>
-                    </p>
-                ))}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <KPI label="TO moyen" value={avgTO+"%"} color="primary" icon={Ic.htl}/>
+            <KPI label="ADR moyen" value={avgADR+" €"} color="secondary" icon={Ic.cash}/>
+            <KPI label="RevPAR" value={avgRP+" €"} color="success"/>
+            <KPI label="CA du jour" value={totCA+" K€"} color="warning"/>
+        </div>
+        <div className="bg-white rounded-xl shadow-sm p-4 overflow-hidden">
+            <Sec right={<XBtn onClick={()=>xls(DAILY.map(d=>({Hotel:d.n,Etoiles:d.e,Chambres:d.ch,TO:d.toD+"%",ADR:d.adrD+"€",RevPAR:d.rpD+"€",CA_K:d.caD,Pickup_7j:d.pk7,Pickup_30j:d.pk30,Statut:d.st})),"journalier")}/>}>Heatmap TO — Semaine glissante</Sec>
+            <div className="overflow-x-auto">
+                <table className="w-full text-xs"><thead><tr><th className="text-left p-1.5 text-muted font-medium">Établissement</th>
+                {HEATMAP.map((d,i)=><th key={i} className={"text-center p-1.5 "+(d.isToday?"font-bold text-primary bg-blue-50 rounded":"text-muted")}>{d.jour}<br/><span className="text-[10px]">{d.date}</span></th>)}
+                </tr></thead><tbody>
+                {H.map(h=>{const short=h.n.replace(/^(Ibis Styles |Ibis Budget |Ibis |Première Classe |Campanile |Mercure |B&B )/,"");
+                return <tr key={h.id} className="border-t border-gray-50"><td className="p-1.5 font-medium truncate max-w-[140px]" title={h.n}>{short}</td>
+                {HEATMAP.map((d,i)=>{const v=d.vals[h.id];const bg=v>=80?"#10b981":v>=65?"#86efac":v>=50?"#fbbf24":"#f87171";
+                return <td key={i} className="p-1 text-center"><div className={"heatmap-cell mx-auto w-12 py-0.5 text-white text-xs font-semibold"+(d.isToday?" ring-2 ring-primary ring-offset-1":"")} style={{background:bg}}>{v}%</div></td>})}
+                </tr>})}</tbody></table>
             </div>
-        );
-    };
+        </div>
+        <div className="bg-white rounded-xl shadow-sm p-4">
+            <Sec>Performance détaillée</Sec>
+            <div className="overflow-x-auto"><table className="w-full text-xs">
+                <thead className="bg-gray-50"><tr>{["Hôtel","★","Ch.","TO","ADR","RevPAR","CA","Pickup 7j","Pickup 30j","Statut"].map(h=><th key={h} className="p-2 text-left text-muted font-medium">{h}</th>)}</tr></thead>
+                <tbody>{[...DAILY].sort((a,b)=>b.caD-a.caD).map(d=><tr key={d.id} className="border-t border-gray-100 hover:bg-gray-50">
+                    <td className="p-2 font-medium">{d.n}</td><td className="p-2 text-yellow-500">{"★".repeat(d.e)}</td><td className="p-2">{d.ch}</td>
+                    <td className={"p-2 font-bold "+(d.toD>=75?"text-green-600":d.toD>=60?"text-blue-600":"text-red-600")}>{d.toD}%</td>
+                    <td className="p-2">{d.adrD} €</td><td className="p-2">{d.rpD} €</td><td className="p-2 font-semibold">{d.caD} K€</td>
+                    <td className="p-2 text-blue-600">{d.pk7} ch.</td><td className="p-2 text-blue-600">{d.pk30} ch.</td>
+                    <td className="p-2"><Bdg statut={d.st}/></td>
+                </tr>)}</tbody></table></div>
+        </div>
+        {(alerts.length>0||warns.length>0)&&<div className="bg-white rounded-xl shadow-sm p-4"><Sec>Alertes</Sec><div className="space-y-2">
+            {alerts.map(d=><div key={d.id} className="flex items-center gap-2 p-2.5 bg-red-50 rounded-lg text-xs">{Ic.wrn}<span className="font-medium text-red-700">{d.n} — TO {d.toD}% sous le seuil de rentabilité</span></div>)}
+            {warns.map(d=><div key={d.id} className="flex items-center gap-2 p-2.5 bg-orange-50 rounded-lg text-xs">{Ic.wrn}<span className="font-medium text-orange-700">{d.n} — TO {d.toD}% vigilance</span></div>)}
+        </div></div>}
+        {alerts.length===0&&warns.length===0&&<div className="p-3 bg-green-50 rounded-lg text-xs font-medium text-green-700 flex items-center gap-2"><span>✓</span> Tous les établissements au-dessus de 65% — Bonne performance</div>}
+    </div>);
+};
 
-    // =====================================================
-    // NAVIGATION
-    // =====================================================
-
-    const TABS = [
-        { id: "global", label: "Vue Globale", icon: Icons.globe },
-        { id: "tresorerie", label: "Trésorerie", icon: Icons.cash },
-        { id: "hotellerie", label: "Hôtelière", icon: Icons.hotel },
-        { id: "immobilier", label: "Immobilière", icon: Icons.building },
-        { id: "budget", label: "Budget 2026", icon: Icons.budget },
-        { id: "etablissements", label: "Établissements", icon: Icons.map },
-        { id: "roadmap", label: "Roadmap", icon: Icons.roadmap }
-    ];
-
-    const Navigation = ({ activeTab, onTabChange }) => (
-        <nav className="sticky top-0 z-40 bg-white shadow-sm border-b border-gray-200">
-            <div className="max-w-7xl mx-auto">
-                <div className="nav-scroll flex">
-                    {TABS.map(tab => (
-                        <button
-                            key={tab.id}
-                            onClick={() => onTabChange(tab.id)}
-                            className={`nav-tab flex items-center gap-2 px-4 py-3 text-sm whitespace-nowrap border-b-3 ${activeTab === tab.id ? 'active' : 'text-muted border-b-transparent'}`}
-                        >
-                            {tab.icon}
-                            <span className="hidden sm:inline">{tab.label}</span>
-                        </button>
-                    ))}
-                </div>
-            </div>
-        </nav>
-    );
-
-    // =====================================================
-    // 1. VUE GLOBALE
-    // =====================================================
-
-    const GlobalePage = () => {
-        const totalCA = HOTELS.reduce((s, h) => s + h.ca, 0);
-        const avgTO = (HOTELS.reduce((s, h) => s + h.to, 0) / HOTELS.length).toFixed(1);
-        const avgRevpar = (HOTELS.reduce((s, h) => s + h.revpar, 0) / HOTELS.length).toFixed(1);
-        const totalChambres = HOTELS.reduce((s, h) => s + h.chambres, 0);
-        const top5 = [...HOTELS].sort((a, b) => b.goppar - a.goppar).slice(0, 5);
-
-        const handleExport = () => {
-            exportToExcel(MONTHLY_CA_BUDGET.map(m => ({
-                Mois: m.mois, "CA (K€)": m.ca, "Budget (K€)": m.budget, "Écart (K€)": m.ca - m.budget
-            })), "Heintz_Vue_Globale", "CA vs Budget");
-        };
-
-        return (
-            <div className="space-y-6">
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                    <KPICard label="CA Total 2025" value={fmtM(totalCA)} trend={9.8} trendLabel="% vs 2024" color="primary" icon={Icons.cash} />
-                    <KPICard label="TO Moyen" value={avgTO + "%"} trend={2.1} trendLabel=" pts" color="success" icon={Icons.hotel} />
-                    <KPICard label="RevPAR Moyen" value={avgRevpar + " €"} trend={5.2} trendLabel="%" color="secondary" icon={Icons.cash} />
-                    <KPICard label="Chambres" value={fmt(totalChambres)} trend={null} color="primary" icon={Icons.building} />
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div className="lg:col-span-2 bg-white rounded-xl p-5 shadow-sm">
-                        <SectionTitle right={<ExportButton onClick={handleExport} />}>
-                            CA vs Budget Mensuel 2025
-                        </SectionTitle>
-                        <ResponsiveContainer width="100%" height={320}>
-                            <ComposedChart data={MONTHLY_CA_BUDGET}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                                <XAxis dataKey="mois" tick={{ fontSize: 12 }} />
-                                <YAxis tick={{ fontSize: 12 }} tickFormatter={v => v + " K€"} />
-                                <Tooltip content={<CustomTooltip />} />
-                                <Legend />
-                                <Bar dataKey="ca" name="CA Réel" fill="#1e3a5f" radius={[4,4,0,0]} barSize={28} />
-                                <Line dataKey="budget" name="Budget" stroke="#d4a853" strokeWidth={2} dot={{ r: 4, fill: "#d4a853" }} />
-                            </ComposedChart>
-                        </ResponsiveContainer>
-                    </div>
-
-                    <div className="bg-white rounded-xl p-5 shadow-sm">
-                        <SectionTitle>Répartition par Segment</SectionTitle>
-                        <ResponsiveContainer width="100%" height={250}>
-                            <PieChart>
-                                <Pie data={SEGMENTS} cx="50%" cy="50%" innerRadius={55} outerRadius={90} dataKey="value" label={({ name, value }) => `${name} ${value}%`} labelLine={true}>
-                                    {SEGMENTS.map((s, i) => <Cell key={i} fill={s.color} />)}
-                                </Pie>
-                                <Tooltip formatter={(v) => v + "%"} />
-                            </PieChart>
-                        </ResponsiveContainer>
-                    </div>
-                </div>
-
-                <div className="bg-white rounded-xl p-5 shadow-sm">
-                    <SectionTitle>Top 5 Hôtels par GOPPAR</SectionTitle>
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-sm">
-                            <thead>
-                                <tr className="border-b border-gray-200">
-                                    <th className="text-left py-3 px-3 font-semibold text-muted">#</th>
-                                    <th className="text-left py-3 px-3 font-semibold text-muted">Hôtel</th>
-                                    <th className="text-right py-3 px-3 font-semibold text-muted">Chambres</th>
-                                    <th className="text-right py-3 px-3 font-semibold text-muted">TO</th>
-                                    <th className="text-right py-3 px-3 font-semibold text-muted">RevPAR</th>
-                                    <th className="text-right py-3 px-3 font-semibold text-muted">GOPPAR</th>
-                                    <th className="text-right py-3 px-3 font-semibold text-muted">CA</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {top5.map((h, i) => (
-                                    <tr key={h.id} className="border-b border-gray-50 hover:bg-gray-50">
-                                        <td className="py-3 px-3 font-bold text-secondary">{i + 1}</td>
-                                        <td className="py-3 px-3 font-medium">{h.name}</td>
-                                        <td className="py-3 px-3 text-right">{h.chambres}</td>
-                                        <td className="py-3 px-3 text-right">{h.to}%</td>
-                                        <td className="py-3 px-3 text-right">{fmtEur(h.revpar)}</td>
-                                        <td className="py-3 px-3 text-right font-semibold text-primary">{fmtEur(h.goppar)}</td>
-                                        <td className="py-3 px-3 text-right">{fmtK(h.ca)}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+// ===== 2. GROUPE PAGE =====
+const GroupePage=()=>{
+    const g=GRP;
+    return(<div className="slide-enter space-y-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <KPI label="CA Total Groupe" value={fM(g.cons.caT)} color="primary" trend={5.2} tl="% vs N-1" icon={Ic.grp}/>
+            <KPI label="Total Actifs" value={fM(g.cons.tActifs)} color="secondary"/>
+            <KPI label="Dette Totale" value={fM(g.cons.detT)} color="danger"/>
+            <KPI label="Remb. Annuel" value={fM(g.cons.rembT)} color="warning"/>
+        </div>
+        <div className="grid md:grid-cols-2 gap-6">
+            <div className="bg-white rounded-xl shadow-sm p-5">
+                <h4 className="font-bold text-sm mb-3 text-primary flex items-center gap-2">{Ic.htl} Pôle Hôtelier</h4>
+                <div className="space-y-2 text-xs">
+                    <div className="flex justify-between"><span className="text-muted">CA hôtelier</span><span className="font-semibold">{fM(g.hot.ca)}</span></div>
+                    <div className="flex justify-between"><span className="text-muted">Valeur murs</span><span className="font-semibold">{fM(g.hot.vMurs)}</span></div>
+                    <div className="flex justify-between"><span className="text-muted">Fonds de commerce</span><span className="font-semibold">{fM(g.hot.fComm)}</span></div>
+                    <div className="flex justify-between"><span className="text-muted">Total actifs hôteliers</span><span className="font-bold text-primary">{fM(g.hot.tActifs)}</span></div>
+                    <div className="flex justify-between"><span className="text-muted">Dette hôtelière</span><span className="font-semibold text-red-600">{fM(g.hot.det)}</span></div>
+                    <div className="flex justify-between"><span className="text-muted">LTV</span><span className="font-semibold">{fP(g.hot.ltv)}</span></div>
+                    <div className="flex justify-between"><span className="text-muted">Remb. annuel</span><span className="font-semibold">{fM(g.hot.remb)}</span></div>
+                    <div className="flex justify-between"><span className="text-muted">Chambres exploitées</span><span className="font-semibold">{fmt(g.hot.chExpl)}</span></div>
                 </div>
             </div>
-        );
-    };
-
-    // =====================================================
-    // 2. VUE TRÉSORERIE
-    // =====================================================
-
-    const TresoreriePage = () => {
-        const current = TREASURY_DATA[TREASURY_DATA.length - 1];
-        const encYTD = TREASURY_DATA.reduce((s, m) => s + m.encTotal, 0);
-        const decYTD = TREASURY_DATA.reduce((s, m) => s + m.decTotal, 0);
-        const ecart = encYTD - decYTD;
-        const soldeStatus = current.solde > 2000 ? "Confort" : current.solde >= 1500 ? "Vigilance" : "Critique";
-
-        const handleExport = () => {
-            exportToExcel(TREASURY_DATA.map(m => ({
-                Mois: m.mois, "Solde (K€)": m.solde, "Encaissements (K€)": m.encTotal, "Décaissements (K€)": m.decTotal,
-                "Hébergement": m.encHeb, "F&B": m.encFB, "Autres enc.": m.encAutres,
-                "Salaires": m.decSal, "Fournisseurs": m.decFourn, "Charges": m.decCharges, "Emprunts": m.decEmprunts, "Investissements": m.decInvest
-            })), "Heintz_Tresorerie", "Flux");
-        };
-
-        return (
-            <div className="space-y-6">
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                    <KPICard label="Solde Actuel" value={fmtK(current.solde)} trend={null} color={current.solde > 2000 ? "success" : current.solde >= 1500 ? "warning" : "danger"} icon={Icons.cash} />
-                    <KPICard label="Encaissements YTD" value={fmtK(encYTD)} trend={null} color="success" icon={Icons.up} />
-                    <KPICard label="Décaissements YTD" value={fmtK(decYTD)} trend={null} color="danger" icon={Icons.down} />
-                    <KPICard label="Écart Net" value={fmtK(ecart)} trend={ecart > 0 ? 1 : -1} trendLabel="" color={ecart >= 0 ? "success" : "danger"} icon={Icons.cash} />
+            <div className="bg-white rounded-xl shadow-sm p-5">
+                <h4 className="font-bold text-sm mb-3 text-secondary flex items-center gap-2">{Ic.bld} Pôle Immobilier</h4>
+                <div className="space-y-2 text-xs">
+                    <div className="flex justify-between"><span className="text-muted">Loyers bruts</span><span className="font-semibold">{fM(g.imm.ca)}</span></div>
+                    <div className="flex justify-between"><span className="text-muted">Valorisation patrimoine</span><span className="font-semibold">{fM(g.imm.val)}</span></div>
+                    <div className="flex justify-between"><span className="text-muted">Dette immobilière</span><span className="font-semibold text-red-600">{fM(g.imm.det)}</span></div>
+                    <div className="flex justify-between"><span className="text-muted">LTV</span><span className="font-semibold">{fP(g.imm.ltv)}</span></div>
+                    <div className="flex justify-between"><span className="text-muted">Remb. annuel</span><span className="font-semibold">{fM(g.imm.remb)}</span></div>
+                    <div className="flex justify-between"><span className="text-muted">Surface totale</span><span className="font-semibold">{fmt(IMM.surf)} m²</span></div>
                 </div>
+            </div>
+        </div>
+        <div className="bg-white rounded-xl shadow-sm p-5">
+            <Sec>Évolution CA Groupe (K€)</Sec>
+            <ResponsiveContainer width="100%" height={280}>
+                <ComposedChart data={g.evo}><CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0"/>
+                <XAxis dataKey="a" tick={{fontSize:11}} stroke="#94a3b8"/>
+                <YAxis tick={{fontSize:11}} stroke="#94a3b8"/>
+                <Tooltip/>
+                <Bar dataKey="ca" fill="#1e3a5f" name="CA K€" radius={[4,4,0,0]}/>
+                <Line type="monotone" dataKey="ca" stroke="#d4a853" strokeWidth={2} dot={{r:4}}/>
+                </ComposedChart>
+            </ResponsiveContainer>
+        </div>
+        <div className="bg-white rounded-xl shadow-sm p-4">
+            <Sec>Pipeline & Projets</Sec>
+            <div className="grid md:grid-cols-2 gap-4">
+                {PIPELINE.map(p=><div key={p.id} className="p-3 border border-green-200 bg-green-50 rounded-lg text-xs">
+                    <div className="font-bold text-green-800">{p.n}</div>
+                    <div className="text-muted mt-1">{p.v} · {p.ch} chambres · CA prév. {fmt(p.caP)} K€</div>
+                    <div className="mt-1"><Bdg statut={p.stat}/> <span className="text-muted ml-2">Échéance : {p.ech}</span></div>
+                </div>)}
+            </div>
+        </div>
+    </div>);
+};
 
-                <div className="flex items-center gap-3 bg-white rounded-xl p-4 shadow-sm">
-                    <span className="text-sm font-medium text-muted">Statut trésorerie :</span>
-                    <StatusBadge statut={soldeStatus} />
-                    <span className="text-xs text-muted ml-2">
-                        Confort {">"}2 000 K€ • Vigilance 1 500-2 000 K€ • Critique {"<"}1 500 K€
-                    </span>
+// ===== 3. GLOBAL PAGE =====
+const GlobalePage=()=>{
+    const totalCH=H.reduce((s,h)=>s+h.ch,0),totalCA=H.reduce((s,h)=>s+h.ca,0);
+    const avgTO=(H.reduce((s,h)=>s+h.to,0)/H.length).toFixed(1);
+    const avgADR=Math.round(H.reduce((s,h)=>s+h.adr,0)/H.length);
+    const avgRP=Math.round(H.reduce((s,h)=>s+h.rp,0)/H.length);
+    const caPerCh=(totalCA/totalCH).toFixed(1);
+    const caM=H.filter(h=>h.caM>0).reduce((s,h)=>s+h.caM,0);
+    const pMetz=Math.round(caM/totalCA*100);
+    const chartData=FC.fc.map(m=>({m:m.m,reel:m.typ==="réel"?m.ca:null,prev:m.typ==="prévision"?m.fc:null,bg:m.bg,n1:m.n1}));
+    return(<div className="slide-enter space-y-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            <KPI label="CA Hôtelier" value={fM(totalCA)} color="primary" trend={5.2} tl="% vs N-1"/>
+            <KPI label="Chambres" value={fmt(totalCH)} color="secondary"/>
+            <KPI label="TO moyen" value={fP(avgTO)} color="success" trend={2.1} tl=" pts"/>
+            <KPI label="RevPAR" value={avgRP+" €"} color="warning" trend={4.8} tl="%"/>
+            <KPI label="ADR moyen" value={avgADR+" €"} color="primary"/>
+            <KPI label="CA/chambre" value={caPerCh+" K€"} color="secondary"/>
+        </div>
+        <div className="grid md:grid-cols-3 gap-6">
+            <div className="md:col-span-2 bg-white rounded-xl shadow-sm p-5">
+                <Sec right={<XBtn onClick={()=>xls(FC.fc.map(m=>({Mois:m.m,CA_Reel:m.typ==="réel"?m.ca:"",Prevision:m.fc||"",Budget:m.bg,N1:m.n1})),"ca_mensuel")}/>}>CA Mensuel — Réel, Prévision, Budget, N-1 (K€)</Sec>
+                <ResponsiveContainer width="100%" height={300}>
+                    <ComposedChart data={chartData}><CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0"/>
+                    <XAxis dataKey="m" tick={{fontSize:11}} stroke="#94a3b8"/>
+                    <YAxis tick={{fontSize:11}} stroke="#94a3b8"/>
+                    <Tooltip content={<CTip/>}/>
+                    <Legend wrapperStyle={{fontSize:11}}/>
+                    <Bar dataKey="reel" fill="#1e3a5f" name="CA Réel" radius={[4,4,0,0]}/>
+                    <Bar dataKey="prev" fill="#10b981" fillOpacity={0.7} name="Prévision" radius={[4,4,0,0]}/>
+                    <Line type="monotone" dataKey="bg" stroke="#d4a853" name="Budget" strokeWidth={2} dot={false}/>
+                    <Line type="monotone" dataKey="n1" stroke="#94a3b8" name="N-1" strokeDasharray="5 5" dot={false}/>
+                    </ComposedChart>
+                </ResponsiveContainer>
+                <div className="flex gap-4 mt-3 text-xs text-muted">
+                    <span>Prévision annuelle : <strong className="text-gray-900">{fK(FC.tFC)}</strong></span>
+                    <span>Ratio YTD/Budget : <strong className={(FC.ratio>=1?"text-green-600":"text-red-600")}>{fP(FC.ratio*100)}</strong></span>
                 </div>
-
-                <div className="bg-white rounded-xl p-5 shadow-sm">
-                    <SectionTitle right={<ExportButton onClick={handleExport} />}>
-                        Évolution Solde Mensuel 2025
-                    </SectionTitle>
-                    <ResponsiveContainer width="100%" height={320}>
-                        <AreaChart data={TREASURY_DATA}>
-                            <defs>
-                                <linearGradient id="colorSolde" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#1e3a5f" stopOpacity={0.15} />
-                                    <stop offset="95%" stopColor="#1e3a5f" stopOpacity={0} />
-                                </linearGradient>
-                            </defs>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                            <XAxis dataKey="mois" tick={{ fontSize: 12 }} />
-                            <YAxis tick={{ fontSize: 12 }} tickFormatter={v => v + " K€"} />
-                            <Tooltip content={<CustomTooltip />} />
-                            <ReferenceLine y={2000} stroke="#10b981" strokeDasharray="5 5" label={{ value: "Confort", position: "right", fontSize: 11, fill: "#10b981" }} />
-                            <ReferenceLine y={1500} stroke="#ef4444" strokeDasharray="5 5" label={{ value: "Critique", position: "right", fontSize: 11, fill: "#ef4444" }} />
-                            <Area type="monotone" dataKey="solde" name="Solde" stroke="#1e3a5f" strokeWidth={2} fill="url(#colorSolde)" dot={{ r: 4, fill: "#1e3a5f" }} />
-                        </AreaChart>
-                    </ResponsiveContainer>
+            </div>
+            <div className="bg-white rounded-xl shadow-sm p-5">
+                <Sec>Segments (réel)</Sec>
+                <ResponsiveContainer width="100%" height={220}>
+                    <PieChart><Pie data={SEG_REEL} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={75} label={({name,value})=>name+" "+value+"%"} labelLine={false} fontSize={10}>
+                    {SEG_REEL.map((d,i)=><Cell key={i} fill={d.color}/>)}</Pie><Tooltip/></PieChart>
+                </ResponsiveContainer>
+                <div className="mt-3 p-3 bg-blue-50 rounded-lg text-xs">
+                    <span className="font-semibold text-primary">Concentration Metz : {pMetz}%</span>
+                    <span className="text-muted block mt-1">{H.filter(h=>h.caM>0).length} établissements sur {H.length}</span>
                 </div>
+            </div>
+        </div>
+        <div className="bg-white rounded-xl shadow-sm p-4">
+            <Sec right={<XBtn onClick={()=>xls(H.map(h=>({Hotel:h.n,Ville:h.v,Etoiles:h.e,Chambres:h.ch,CA_K:h.ca,TO:h.to+"%",ADR:h.adr+"€",RevPAR:h.rp+"€"})),"hotels")}/>}>Top performers</Sec>
+            <div className="grid md:grid-cols-3 gap-3 text-xs">
+                <div className="p-3 bg-green-50 rounded-lg"><span className="text-muted">Meilleur TO</span><br/><strong>{[...H].sort((a,b)=>b.to-a.to)[0].n}</strong> — {[...H].sort((a,b)=>b.to-a.to)[0].to}%</div>
+                <div className="p-3 bg-yellow-50 rounded-lg"><span className="text-muted">Meilleur ADR</span><br/><strong>{[...H].sort((a,b)=>b.adr-a.adr)[0].n}</strong> — {[...H].sort((a,b)=>b.adr-a.adr)[0].adr} €</div>
+                <div className="p-3 bg-blue-50 rounded-lg"><span className="text-muted">Meilleur CA</span><br/><strong>{[...H].sort((a,b)=>b.ca-a.ca)[0].n}</strong> — {fK([...H].sort((a,b)=>b.ca-a.ca)[0].ca)}</div>
+            </div>
+        </div>
+    </div>);
+};
 
-                <div className="bg-white rounded-xl p-5 shadow-sm">
-                    <SectionTitle>Flux Mensuels Détaillés</SectionTitle>
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-xs">
-                            <thead>
-                                <tr className="border-b-2 border-gray-200">
-                                    <th className="text-left py-2 px-2 font-semibold text-muted">Mois</th>
-                                    <th className="text-right py-2 px-2 font-semibold text-green-600">Héberg.</th>
-                                    <th className="text-right py-2 px-2 font-semibold text-green-600">F&B</th>
-                                    <th className="text-right py-2 px-2 font-semibold text-green-600">Autres</th>
-                                    <th className="text-right py-2 px-2 font-semibold text-green-700 bg-green-50">Total Enc.</th>
-                                    <th className="text-right py-2 px-2 font-semibold text-red-600">Salaires</th>
-                                    <th className="text-right py-2 px-2 font-semibold text-red-600">Fourn.</th>
-                                    <th className="text-right py-2 px-2 font-semibold text-red-600">Charges</th>
-                                    <th className="text-right py-2 px-2 font-semibold text-red-600">Emprunts</th>
-                                    <th className="text-right py-2 px-2 font-semibold text-red-600">Invest.</th>
-                                    <th className="text-right py-2 px-2 font-semibold text-red-700 bg-red-50">Total Déc.</th>
-                                    <th className="text-right py-2 px-2 font-bold text-primary bg-blue-50">Solde</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {TREASURY_DATA.map((m, i) => {
-                                    const soldeColor = m.solde > 2000 ? "text-green-700" : m.solde >= 1500 ? "text-orange-600" : "text-red-600";
-                                    return (
-                                        <tr key={i} className="border-b border-gray-50 hover:bg-gray-50">
-                                            <td className="py-2 px-2 font-medium">{m.mois}</td>
-                                            <td className="py-2 px-2 text-right">{fmt(m.encHeb)}</td>
-                                            <td className="py-2 px-2 text-right">{fmt(m.encFB)}</td>
-                                            <td className="py-2 px-2 text-right">{fmt(m.encAutres)}</td>
-                                            <td className="py-2 px-2 text-right font-semibold text-green-700 bg-green-50">{fmt(m.encTotal)}</td>
-                                            <td className="py-2 px-2 text-right">{fmt(m.decSal)}</td>
-                                            <td className="py-2 px-2 text-right">{fmt(m.decFourn)}</td>
-                                            <td className="py-2 px-2 text-right">{fmt(m.decCharges)}</td>
-                                            <td className="py-2 px-2 text-right">{fmt(m.decEmprunts)}</td>
-                                            <td className="py-2 px-2 text-right">{fmt(m.decInvest)}</td>
-                                            <td className="py-2 px-2 text-right font-semibold text-red-700 bg-red-50">{fmt(m.decTotal)}</td>
-                                            <td className={`py-2 px-2 text-right font-bold bg-blue-50 ${soldeColor}`}>{fmt(m.solde)}</td>
-                                        </tr>
-                                    );
-                                })}
-                            </tbody>
-                        </table>
+// ===== 4. TRESORERIE PAGE =====
+const TresoreriePage=()=>{
+    const maxSol=Math.max(...TRES.map(t=>t.sol));
+    const minSol=Math.min(...TRES.map(t=>t.sol));
+    const avgSol=Math.round(TRES.reduce((s,t)=>s+t.sol,0)/12);
+    const totEnc=TRES.reduce((s,t)=>s+t.enc,0);
+    const totDec=TRES.reduce((s,t)=>s+t.dec,0);
+    const dH=GRP.hot.det,dI=GRP.imm.det,dT=GRP.cons.detT;
+    return(<div className="slide-enter space-y-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <KPI label="Solde moyen" value={fK(avgSol)} color="primary" icon={Ic.cash}/>
+            <KPI label="Remb. annuel total" value={fM(GRP.cons.rembT)} color="danger"/>
+            <KPI label="DSCR Immobilier" value={fP(IMM.dscr)} color={IMM.dscr>=120?"success":"warning"}/>
+            <KPI label="LTV global" value={fP(Math.round(dT/GRP.cons.tActifs*100))} color="secondary"/>
+        </div>
+        <div className="bg-white rounded-xl shadow-sm p-5">
+            <Sec right={<XBtn onClick={()=>xls(TRES,"tresorerie")}/>}>Flux de trésorerie mensuel (K€)</Sec>
+            <ResponsiveContainer width="100%" height={300}>
+                <ComposedChart data={TRES}><CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0"/>
+                <XAxis dataKey="m" tick={{fontSize:11}} stroke="#94a3b8"/>
+                <YAxis tick={{fontSize:11}} stroke="#94a3b8"/>
+                <Tooltip content={<CTip/>}/><Legend wrapperStyle={{fontSize:11}}/>
+                <Bar dataKey="enc" fill="#10b981" name="Encaissements" radius={[4,4,0,0]}/>
+                <Bar dataKey="dec" fill="#ef4444" name="Décaissements" radius={[4,4,0,0]}/>
+                <Line type="monotone" dataKey="sol" stroke="#1e3a5f" name="Solde" strokeWidth={2.5} dot={{r:3}}/>
+                </ComposedChart>
+            </ResponsiveContainer>
+        </div>
+        <div className="grid md:grid-cols-2 gap-6">
+            <div className="bg-white rounded-xl shadow-sm p-5">
+                <Sec>Endettement par pôle</Sec>
+                <div className="space-y-4">
+                    <div><div className="flex justify-between text-xs mb-1"><span className="font-medium">Hôtelier</span><span className="font-bold text-red-600">{fM(dH)} ({fP(dH/dT*100,0)})</span></div>
+                    <div className="w-full bg-gray-200 rounded-full h-3"><div className="bg-red-500 h-3 rounded-full progress-bar" style={{width:(dH/dT*100)+"%"}}></div></div></div>
+                    <div><div className="flex justify-between text-xs mb-1"><span className="font-medium">Immobilier</span><span className="font-bold text-orange-600">{fM(dI)} ({fP(dI/dT*100,0)})</span></div>
+                    <div className="w-full bg-gray-200 rounded-full h-3"><div className="bg-orange-400 h-3 rounded-full progress-bar" style={{width:(dI/dT*100)+"%"}}></div></div></div>
+                    <div className="pt-2 border-t text-xs flex justify-between"><span className="font-semibold">Dette totale</span><span className="font-bold">{fM(dT)}</span></div>
+                </div>
+            </div>
+            <div className="bg-white rounded-xl shadow-sm p-5">
+                <Sec>Remboursements annuels</Sec>
+                <div className="space-y-3 text-xs">
+                    <div className="flex justify-between p-2 bg-gray-50 rounded"><span>Remb. hôtelier (K+I)</span><span className="font-bold">{fM(GRP.hot.remb)}</span></div>
+                    <div className="flex justify-between p-2 bg-gray-50 rounded"><span>Remb. immobilier</span><span className="font-bold">{fM(GRP.imm.remb)}</span></div>
+                    <div className="flex justify-between p-2 bg-primary text-white rounded"><span>Total remboursements</span><span className="font-bold">{fM(GRP.cons.rembT)}</span></div>
+                    <div className="flex justify-between p-2 bg-blue-50 rounded"><span>LTV hôtelier</span><span className="font-bold">{fP(GRP.hot.ltv)}</span></div>
+                    <div className="flex justify-between p-2 bg-blue-50 rounded"><span>LTV immobilier</span><span className="font-bold">{fP(GRP.imm.ltv)}</span></div>
+                </div>
+            </div>
+        </div>
+        {minSol<1500&&<div className="p-3 bg-red-50 rounded-lg text-xs font-medium text-red-700 flex items-center gap-2">{Ic.wrn} Solde minimum à {fK(minSol)} — prévoir ligne de crédit court terme</div>}
+    </div>);
+};
+
+// ===== 5. HOTELLERIE PAGE =====
+const HotelierePage=()=>{
+    const [filtre,setFiltre]=useState("all");
+    const [tri,setTri]=useState("ca");
+    const enseignes=[...new Set(H.map(h=>h.ens))];
+    const filtered=filtre==="all"?H:H.filter(h=>h.ens===filtre);
+    const sorted=[...filtered].sort((a,b)=>tri==="ca"?b.ca-a.ca:tri==="to"?b.to-a.to:tri==="rp"?b.rp-a.rp:b.ch-a.ch);
+    const totalLab=H.reduce((s,h)=>s+h.lab.length,0);
+    return(<div className="slide-enter space-y-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <KPI label="Hôtels exploités" value={H.length} color="primary" icon={Ic.htl}/>
+            <KPI label="Chambres totales" value={fmt(H.reduce((s,h)=>s+h.ch,0))} color="secondary"/>
+            <KPI label="Labels RSE" value={totalLab} color="success"/>
+            <KPI label="Enseignes" value={enseignes.length} color="warning"/>
+        </div>
+        <div className="flex flex-wrap gap-2 items-center">
+            <span className="text-xs font-medium text-muted">Filtre :</span>
+            <button onClick={()=>setFiltre("all")} className={"px-3 py-1 rounded-full text-xs font-medium "+(filtre==="all"?"bg-primary text-white":"bg-gray-100 text-gray-600")}>Tous ({H.length})</button>
+            {enseignes.map(e=><button key={e} onClick={()=>setFiltre(e)} className={"px-3 py-1 rounded-full text-xs font-medium "+(filtre===e?"bg-primary text-white":"bg-gray-100 text-gray-600")}>{e} ({H.filter(h=>h.ens===e).length})</button>)}
+            <span className="ml-4 text-xs font-medium text-muted">Tri :</span>
+            {[["ca","CA"],["to","TO"],["rp","RevPAR"],["ch","Chambres"]].map(([k,l])=><button key={k} onClick={()=>setTri(k)} className={"px-2 py-1 rounded text-xs "+(tri===k?"bg-secondary text-white":"bg-gray-100 text-gray-600")}>{l}</button>)}
+        </div>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {sorted.map(h=><div key={h.id} className="hotel-card bg-white rounded-xl shadow-sm p-4 border-l-4" style={{borderLeftColor:h.e>=4?"#d4a853":h.e>=3?"#1e3a5f":h.e>=2?"#10b981":"#94a3b8"}}>
+                <div className="flex justify-between items-start mb-2">
+                    <div><h4 className="font-bold text-sm">{h.n}</h4><p className="text-xs text-muted">{h.v} · {"★".repeat(h.e)} · {h.fr}</p></div>
+                    <span className="text-xs bg-gray-100 px-2 py-0.5 rounded">{h.ch} ch.</span>
+                </div>
+                <div className="grid grid-cols-3 gap-2 text-xs text-center mb-2">
+                    <div className="bg-gray-50 rounded p-1.5"><span className="text-muted block">TO</span><span className="font-bold">{h.to}%</span></div>
+                    <div className="bg-gray-50 rounded p-1.5"><span className="text-muted block">ADR</span><span className="font-bold">{h.adr}€</span></div>
+                    <div className="bg-gray-50 rounded p-1.5"><span className="text-muted block">CA</span><span className="font-bold">{fK(h.ca)}</span></div>
+                </div>
+                <div className="text-xs text-muted"><span className="font-medium">RevPAR:</span> {h.rp}€ · <span className="font-medium">GOP:</span> {h.gp}%</div>
+                {h.lab.length>0&&<div className="flex flex-wrap gap-1 mt-2">{h.lab.map(l=><span key={l} className="text-[10px] px-1.5 py-0.5 bg-green-100 text-green-700 rounded-full">{l}</span>)}</div>}
+                <div className="text-[10px] text-muted mt-2">{h.prop} · {h.acq}</div>
+            </div>)}
+        </div>
+    </div>);
+};
+
+// ===== 6. COUTS PAGE =====
+const CoutsPage=()=>{
+    const chTotal=H.reduce((s,h)=>s+h.ch,0);
+    const coutParCh=Math.round(BDG.chg.t/chTotal*10)/10;
+    const costData=BDG.chg.d.map(d=>({name:d.l,value:d.m,pct:d.p}));
+    const franData=[];
+    const enseignes=[...new Set(H.map(h=>h.ens))];
+    enseignes.forEach(e=>{const hs=H.filter(h=>h.ens===e);const ca=hs.reduce((s,h)=>s+h.ca,0);const ch=hs.reduce((s,h)=>s+h.ch,0);
+        const txFr=e==="Accor"?0.12:e==="Louvre Hotels"?0.10:0.08;
+        franData.push({name:e,hotels:hs.length,ch,ca,franchise:Math.round(ca*txFr),txFr:Math.round(txFr*100)});
+    });
+    const ccData=H.map(h=>({name:h.n.replace(/^(Ibis Styles |Ibis Budget |Ibis |Première Classe |Campanile |Mercure |B&B )/,"").substring(0,15),cc:h.cc})).sort((a,b)=>b.cc-a.cc);
+    return(<div className="slide-enter space-y-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <KPI label="Charges totales" value={fM(BDG.chg.t)} color="danger" icon={Ic.chrt}/>
+            <KPI label="Coût/chambre/an" value={coutParCh+" K€"} color="warning"/>
+            <KPI label="Masse salariale" value={fP(54.5)} color="primary"/>
+            <KPI label="GOP Budget" value={fM(BDG.gop)} color="success"/>
+        </div>
+        <div className="grid md:grid-cols-2 gap-6">
+            <div className="bg-white rounded-xl shadow-sm p-5">
+                <Sec>Structure des coûts</Sec>
+                <ResponsiveContainer width="100%" height={250}>
+                    <PieChart><Pie data={costData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={85} label={({name,percent})=>name.substring(0,10)+" "+Math.round(percent*100)+"%"} labelLine={false} fontSize={10}>
+                    {costData.map((d,i)=><Cell key={i} fill={COLS[i]}/>)}</Pie><Tooltip/></PieChart>
+                </ResponsiveContainer>
+            </div>
+            <div className="bg-white rounded-xl shadow-sm p-5">
+                <Sec>Coût complet / chambre / nuit (€)</Sec>
+                <ResponsiveContainer width="100%" height={250}>
+                    <BarChart data={ccData} layout="vertical"><CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0"/>
+                    <XAxis type="number" tick={{fontSize:10}} stroke="#94a3b8"/>
+                    <YAxis dataKey="name" type="category" width={100} tick={{fontSize:9}} stroke="#94a3b8"/>
+                    <Tooltip/><Bar dataKey="cc" fill="#1e3a5f" name="€/ch/nuit" radius={[0,4,4,0]}/></BarChart>
+                </ResponsiveContainer>
+            </div>
+        </div>
+        <div className="bg-white rounded-xl shadow-sm p-4">
+            <Sec>Analyse franchise par enseigne</Sec>
+            <div className="overflow-x-auto"><table className="w-full text-xs">
+                <thead className="bg-gray-50"><tr>{["Enseigne","Hôtels","Chambres","CA (K€)","Taux franchise","Franchise est. (K€)"].map(h=><th key={h} className="p-2 text-left text-muted font-medium">{h}</th>)}</tr></thead>
+                <tbody>{franData.map(f=><tr key={f.name} className="border-t border-gray-100">
+                    <td className="p-2 font-semibold">{f.name}</td><td className="p-2">{f.hotels}</td><td className="p-2">{f.ch}</td>
+                    <td className="p-2">{fmt(f.ca)}</td><td className="p-2">{f.txFr}%</td><td className="p-2 font-bold">{fmt(f.franchise)}</td>
+                </tr>)}</tbody>
+            </table></div>
+        </div>
+        <div className="bg-white rounded-xl shadow-sm p-4">
+            <Sec>Détail charges budget 2026 (K€)</Sec>
+            <div className="space-y-2">{BDG.chg.d.map(d=><div key={d.l} className="flex items-center gap-3">
+                <span className="text-xs w-28 font-medium">{d.l}</span>
+                <div className="flex-1 bg-gray-200 rounded-full h-4"><div className="h-4 rounded-full progress-bar flex items-center pl-2 text-white text-[10px] font-medium" style={{width:Math.max(d.p*2,8)+"%",background:d.p>30?"#ef4444":d.p>10?"#f59e0b":"#10b981"}}>{d.p}%</div></div>
+                <span className="text-xs font-bold w-20 text-right">{fmt(d.m)} K€</span>
+            </div>)}</div>
+        </div>
+    </div>);
+};
+
+// ===== 7. IMMOBILIERE PAGE =====
+const ImmobilierePage=()=>{
+    const im=IMM;
+    return(<div className="slide-enter space-y-6">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <KPI label="Surface totale" value={fmt(im.surf)+" m²"} color="primary" icon={Ic.bld}/>
+            <KPI label="Valorisation" value={fM(im.val)} color="secondary"/>
+            <KPI label="Loyers bruts" value={fM(im.loyB)} color="success"/>
+            <KPI label="Taux capitalisation" value={fP(im.txC)} color="warning"/>
+            <KPI label="LTV" value={fP(im.ltv)} color={im.ltv<50?"success":"danger"}/>
+        </div>
+        <div className="grid md:grid-cols-3 gap-6">
+            <div className="bg-white rounded-xl shadow-sm p-5">
+                <Sec>Par type de bien</Sec>
+                <ResponsiveContainer width="100%" height={220}>
+                    <PieChart><Pie data={im.pTyp} dataKey="v" nameKey="n" cx="50%" cy="50%" outerRadius={75} label={({name,value})=>name+" "+value+"%"} labelLine={false} fontSize={9}>
+                    {im.pTyp.map((d,i)=><Cell key={i} fill={d.c}/>)}</Pie><Tooltip/></PieChart>
+                </ResponsiveContainer>
+            </div>
+            <div className="bg-white rounded-xl shadow-sm p-5">
+                <Sec>Par type de client</Sec>
+                <ResponsiveContainer width="100%" height={220}>
+                    <PieChart><Pie data={im.pCli} dataKey="v" nameKey="n" cx="50%" cy="50%" outerRadius={75} label={({name,value})=>name+" "+value+"%"} labelLine={false} fontSize={9}>
+                    {im.pCli.map((d,i)=><Cell key={i} fill={d.c}/>)}</Pie><Tooltip/></PieChart>
+                </ResponsiveContainer>
+            </div>
+            <div className="bg-white rounded-xl shadow-sm p-5">
+                <Sec>Par localisation</Sec>
+                <ResponsiveContainer width="100%" height={220}>
+                    <PieChart><Pie data={im.pLoc} dataKey="v" nameKey="n" cx="50%" cy="50%" outerRadius={75} label={({name,value})=>name+" "+value+"%"} labelLine={false} fontSize={9}>
+                    {im.pLoc.map((d,i)=><Cell key={i} fill={d.c}/>)}</Pie><Tooltip/></PieChart>
+                </ResponsiveContainer>
+            </div>
+        </div>
+        <div className="bg-white rounded-xl shadow-sm p-4">
+            <Sec right={<XBtn onClick={()=>xls(im.actifs.map(a=>({Localisation:a.l,Type:a.t,Surface_m2:a.s,Locataire:a.loc,Acquisition:a.a})),"immobilier")}/>}>Portefeuille immobilier — {im.actifs.length} actifs</Sec>
+            <div className="overflow-x-auto"><table className="w-full text-xs">
+                <thead className="bg-gray-50"><tr>{["#","Localisation","Type de bien","Surface","Locataire/Usage","Acquisition"].map(h=><th key={h} className="p-2 text-left text-muted font-medium">{h}</th>)}</tr></thead>
+                <tbody>{im.actifs.map((a,i)=><tr key={i} className="border-t border-gray-100 hover:bg-gray-50">
+                    <td className="p-2 text-muted">{i+1}</td><td className="p-2 font-medium">{a.l}</td><td className="p-2">{a.t}</td>
+                    <td className="p-2">{a.s>0?fmt(a.s)+" m²":"—"}</td><td className="p-2">{a.loc}</td><td className="p-2 text-muted">{a.a}</td>
+                </tr>)}</tbody>
+            </table></div>
+        </div>
+        <div className="grid md:grid-cols-3 gap-4 text-xs">
+            <div className="bg-white rounded-xl shadow-sm p-4"><div className="text-muted mb-1">Loyers nets</div><div className="text-xl font-bold">{fM(im.loyN)}</div><div className="text-muted">Rendement net : {fP((im.loyN/im.val)*100)}</div></div>
+            <div className="bg-white rounded-xl shadow-sm p-4"><div className="text-muted mb-1">Dette immobilière</div><div className="text-xl font-bold text-red-600">{fM(im.det)}</div><div className="text-muted">Remb. annuel : {fM(im.remb)}</div></div>
+            <div className="bg-white rounded-xl shadow-sm p-4"><div className="text-muted mb-1">DSCR</div><div className="text-xl font-bold text-green-600">{fP(im.dscr)}</div><div className="text-muted">{im.dscr>=120?"Confortable":"Vigilance"} (seuil : 120%)</div></div>
+        </div>
+    </div>);
+};
+
+// ===== 8. BUDGET PAGE =====
+const BudgetPage=()=>{
+    const [simADR,setSimADR]=useState(0);
+    const [simTO,setSimTO]=useState(0);
+    const adrF=1+simADR/100,toF=1+simTO/70;
+    const simRev=Math.round(BDG.rev.t*adrF*toF);
+    const simGOP=simRev-BDG.chg.t;
+    const simRN=Math.round(simGOP-(BDG.gop-BDG.rn));
+    const revData=[{name:"Hébergement",value:BDG.rev.heb.t,color:"#1e3a5f"},{name:"F&B",value:BDG.rev.fb.t,color:"#d4a853"},{name:"Autres",value:BDG.rev.aut.t,color:"#10b981"}];
+    const mData=MCB.map(m=>({m:m.m,bg:m.bg,ca:m.ca}));
+    return(<div className="slide-enter space-y-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <KPI label="Revenus budget" value={fM(BDG.rev.t)} color="primary" icon={Ic.calc}/>
+            <KPI label="Charges budget" value={fM(BDG.chg.t)} color="danger"/>
+            <KPI label="GOP budget" value={fM(BDG.gop)} color="success"/>
+            <KPI label="Résultat net" value={fM(BDG.rn)} color="secondary"/>
+        </div>
+        <div className="grid md:grid-cols-2 gap-6">
+            <div className="bg-white rounded-xl shadow-sm p-5">
+                <Sec>Revenus par pôle</Sec>
+                <ResponsiveContainer width="100%" height={220}>
+                    <PieChart><Pie data={revData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={75} label={({name,value})=>name+" "+fK(value)} labelLine={false} fontSize={10}>
+                    {revData.map((d,i)=><Cell key={i} fill={d.color}/>)}</Pie><Tooltip/></PieChart>
+                </ResponsiveContainer>
+                <div className="space-y-1 mt-3 text-xs">
+                    {BDG.rev.heb.d.map(r=><div key={r.l} className="flex justify-between text-muted"><span>{r.l}</span><span className="font-medium text-gray-700">{fmt(r.m)} K€</span></div>)}
+                </div>
+            </div>
+            <div className="bg-white rounded-xl shadow-sm p-5">
+                <Sec>Budget vs Réalisé mensuel</Sec>
+                <ResponsiveContainer width="100%" height={250}>
+                    <ComposedChart data={mData}><CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0"/>
+                    <XAxis dataKey="m" tick={{fontSize:11}} stroke="#94a3b8"/>
+                    <YAxis tick={{fontSize:11}} stroke="#94a3b8"/>
+                    <Tooltip content={<CTip/>}/>
+                    <Bar dataKey="ca" fill="#1e3a5f" name="Réalisé" radius={[4,4,0,0]}/>
+                    <Line type="monotone" dataKey="bg" stroke="#d4a853" name="Budget" strokeWidth={2} dot={false}/>
+                    </ComposedChart>
+                </ResponsiveContainer>
+            </div>
+        </div>
+        <div className="bg-white rounded-xl shadow-sm p-5 border-2 border-secondary">
+            <Sec>Simulation Budget — Impact ADR & TO</Sec>
+            <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                    <div>
+                        <div className="flex justify-between text-xs mb-1"><span className="font-medium">Variation ADR</span><span className={"font-bold "+(simADR>=0?"text-green-600":"text-red-600")}>{simADR>=0?"+":""}{simADR}%</span></div>
+                        <input type="range" className="sim-slider" min="-20" max="20" value={simADR} onChange={e=>setSimADR(+e.target.value)}/>
+                    </div>
+                    <div>
+                        <div className="flex justify-between text-xs mb-1"><span className="font-medium">Variation TO</span><span className={"font-bold "+(simTO>=0?"text-green-600":"text-red-600")}>{simTO>=0?"+":""}{simTO} pts</span></div>
+                        <input type="range" className="sim-slider" min="-10" max="10" value={simTO} onChange={e=>setSimTO(+e.target.value)}/>
+                    </div>
+                    <button onClick={()=>{setSimADR(0);setSimTO(0)}} className="text-xs text-primary underline">Réinitialiser</button>
+                </div>
+                <div className="grid grid-cols-3 gap-3 text-center">
+                    <div className="bg-blue-50 rounded-xl p-3">
+                        <div className="text-xs text-muted">Revenus simulés</div>
+                        <div className={"text-lg font-bold "+(simRev>=BDG.rev.t?"text-green-600":"text-red-600")}>{fM(simRev)}</div>
+                        <div className="text-xs text-muted">Budget: {fM(BDG.rev.t)}</div>
+                    </div>
+                    <div className="bg-green-50 rounded-xl p-3">
+                        <div className="text-xs text-muted">GOP simulé</div>
+                        <div className={"text-lg font-bold "+(simGOP>=BDG.gop?"text-green-600":"text-red-600")}>{fM(simGOP)}</div>
+                        <div className="text-xs text-muted">Budget: {fM(BDG.gop)}</div>
+                    </div>
+                    <div className="bg-yellow-50 rounded-xl p-3">
+                        <div className="text-xs text-muted">RN simulé</div>
+                        <div className={"text-lg font-bold "+(simRN>=BDG.rn?"text-green-600":"text-red-600")}>{fM(simRN)}</div>
+                        <div className="text-xs text-muted">Budget: {fM(BDG.rn)}</div>
                     </div>
                 </div>
+            </div>
+        </div>
+        <div className="bg-white rounded-xl shadow-sm p-4">
+            <Sec>CAPEX 2026</Sec>
+            <div className="overflow-x-auto"><table className="w-full text-xs">
+                <thead className="bg-gray-50"><tr><th className="p-2 text-left text-muted">Poste</th><th className="p-2 text-right text-muted">Montant (K€)</th><th className="p-2 text-right text-muted">% total</th></tr></thead>
+                <tbody>{BDG.cpx.d.map(c=><tr key={c.l} className="border-t border-gray-100"><td className="p-2 font-medium">{c.l}</td>
+                <td className="p-2 text-right font-semibold">{fmt(c.m)}</td><td className="p-2 text-right text-muted">{Math.round(c.m/BDG.cpx.t*100)}%</td></tr>)}
+                <tr className="border-t-2 border-gray-300 bg-gray-50"><td className="p-2 font-bold">Total CAPEX</td><td className="p-2 text-right font-bold">{fmt(BDG.cpx.t)} K€</td><td className="p-2 text-right font-bold">100%</td></tr>
+                </tbody></table></div>
+        </div>
+    </div>);
+};
 
-                <div className="bg-white rounded-xl p-5 shadow-sm">
-                    <SectionTitle>Prévisions T1 2026</SectionTitle>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="p-4 rounded-lg bg-green-50 border border-green-200">
-                            <div className="text-sm font-medium text-green-700 mb-1">Scénario Optimiste</div>
-                            <div className="text-2xl font-bold text-green-800">7 200 K€</div>
-                            <div className="text-xs text-green-600 mt-1">+8% vs réalisé</div>
+// ===== 9. ETABLISSEMENTS PAGE (MAP) =====
+const EtablissementsPage=()=>{
+    const mRef=useRef(null);
+    const mInst=useRef(null);
+    useEffect(()=>{
+        if(mInst.current){mInst.current.remove();mInst.current=null;}
+        const map=L.map(mRef.current).setView([48.5,5.5],7);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'OpenStreetMap'}).addTo(map);
+        const mkIcon=(color,label)=>L.divIcon({className:'',html:'<div style="background:'+color+';color:white;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:bold;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,.3)">'+label+'</div>'});
+        H.forEach(h=>{L.marker([h.lat,h.lng],{icon:mkIcon('#1e3a5f',h.e+'★')}).addTo(map).bindPopup('<div style="font-family:Inter,sans-serif;font-size:12px"><strong>'+h.n+'</strong><br/>'+h.v+' · '+h.ch+' ch. · '+h.e+'★<br/>CA: '+fmt(h.ca)+' K€ · TO: '+h.to+'%<br/><em>'+h.prop+'</em></div>');});
+        H_NON_EXPL.forEach(h=>{L.marker([h.lat,h.lng],{icon:mkIcon('#94a3b8','M')}).addTo(map).bindPopup('<div style="font-family:Inter,sans-serif;font-size:12px"><strong>'+h.n+'</strong><br/>'+h.v+' · '+h.ch+' ch.<br/>Exploitant: '+h.expl+'<br/>Livraison: '+h.liv+'</div>');});
+        PIPELINE.forEach(h=>{L.marker([h.lat,h.lng],{icon:mkIcon('#10b981','P')}).addTo(map).bindPopup('<div style="font-family:Inter,sans-serif;font-size:12px"><strong>'+h.n+'</strong><br/>'+h.v+' · '+h.ch+' ch.<br/>'+h.stat+' — '+h.ech+'<br/>CA prév: '+fmt(h.caP)+' K€</div>');});
+        mInst.current=map;
+        setTimeout(()=>map.invalidateSize(),200);
+    },[]);
+    return(<div className="slide-enter space-y-6">
+        <div className="grid grid-cols-3 gap-4 text-center text-xs">
+            <div className="flex items-center justify-center gap-2"><div className="w-4 h-4 rounded-full" style={{background:'#1e3a5f'}}></div><span>Exploités ({H.length})</span></div>
+            <div className="flex items-center justify-center gap-2"><div className="w-4 h-4 rounded-full" style={{background:'#94a3b8'}}></div><span>Murs non exploités ({H_NON_EXPL.length})</span></div>
+            <div className="flex items-center justify-center gap-2"><div className="w-4 h-4 rounded-full" style={{background:'#10b981'}}></div><span>Pipeline ({PIPELINE.length})</span></div>
+        </div>
+        <div ref={mRef} style={{height:"520px"}} className="rounded-xl shadow-sm border border-gray-200"></div>
+        <div className="bg-white rounded-xl shadow-sm p-4">
+            <Sec>Répartition géographique</Sec>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                {[...new Set(H.map(h=>h.v))].sort().map(v=>{const hs=H.filter(h=>h.v===v);
+                return <div key={v} className="p-2.5 bg-gray-50 rounded-lg"><span className="font-bold">{v}</span><br/><span className="text-muted">{hs.length} hôtel{hs.length>1?"s":""} — {hs.reduce((s,h)=>s+h.ch,0)} ch.</span></div>})}
+            </div>
+        </div>
+    </div>);
+};
+
+// ===== 10. ROADMAP PAGE =====
+const RoadmapPage=()=>{
+    const totBud=RDM.reduce((s,p)=>s+p.bud,0);
+    const totDep=RDM.reduce((s,p)=>s+p.dep,0);
+    const totCH=RDM.filter(p=>p.ch).reduce((s,p)=>s+p.ch,0);
+    const totCAP=RDM.filter(p=>p.caP).reduce((s,p)=>s+p.caP,0);
+    const stColors={"En cours":"#3b82f6","Planifié":"#94a3b8","Étude":"#8b5cf6"};
+    return(<div className="slide-enter space-y-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <KPI label="Budget total projets" value={fM(totBud)} color="primary" icon={Ic.clip}/>
+            <KPI label="Dépensé" value={fM(totDep)} color="warning"/>
+            <KPI label="Chambres impactées" value={fmt(totCH)} color="secondary"/>
+            <KPI label="CA prévisionnel" value={fM(totCAP)} color="success"/>
+        </div>
+        <div className="bg-white rounded-xl shadow-sm p-4">
+            <Sec right={<XBtn onClick={()=>xls(RDM.map(p=>({Projet:p.nom,Type:p.typ,Budget_K:p.bud,Depense_K:p.dep,Progression:p.prg+"%",Responsable:p.resp,Echeance:p.ech,Statut:p.st})),"roadmap")}/>}>Projets ({RDM.length})</Sec>
+            <div className="space-y-4">
+                {RDM.map(p=><div key={p.id} className="border border-gray-200 rounded-xl p-4 hover:shadow-md transition-shadow">
+                    <div className="flex items-start justify-between mb-2">
+                        <div><h4 className="font-bold text-sm">{p.nom}</h4><p className="text-xs text-muted">{p.typ} · Resp: {p.resp} · Échéance: {p.ech}</p></div>
+                        <Bdg statut={p.st}/>
+                    </div>
+                    <div className="flex items-center gap-3 mb-2">
+                        <div className="flex-1 bg-gray-200 rounded-full h-3">
+                            <div className="h-3 rounded-full progress-bar" style={{width:p.prg+"%",background:stColors[p.st]||"#94a3b8"}}></div>
                         </div>
-                        <div className="p-4 rounded-lg bg-blue-50 border border-blue-200">
-                            <div className="text-sm font-medium text-blue-700 mb-1">Scénario Base</div>
-                            <div className="text-2xl font-bold text-blue-800">6 500 K€</div>
-                            <div className="text-xs text-blue-600 mt-1">+3% vs réalisé</div>
-                        </div>
-                        <div className="p-4 rounded-lg bg-red-50 border border-red-200">
-                            <div className="text-sm font-medium text-red-700 mb-1">Scénario Pessimiste</div>
-                            <div className="text-2xl font-bold text-red-800">5 800 K€</div>
-                            <div className="text-xs text-red-600 mt-1">-2% vs réalisé</div>
-                        </div>
+                        <span className="text-xs font-bold w-12 text-right">{p.prg}%</span>
+                    </div>
+                    <div className="flex flex-wrap gap-4 text-xs text-muted">
+                        <span>Budget: <strong className="text-gray-700">{fK(p.bud)}</strong></span>
+                        <span>Dépensé: <strong className="text-gray-700">{fK(p.dep)}</strong></span>
+                        {p.ch&&<span>Chambres: <strong className="text-gray-700">{p.ch}</strong></span>}
+                        {p.caP&&<span>CA prév.: <strong className="text-green-600">{fK(p.caP)}</strong></span>}
+                        {p.rsk&&<span className="text-orange-600 font-medium">Risque: {p.rsk}</span>}
+                    </div>
+                </div>)}
+            </div>
+        </div>
+        <div className="bg-white rounded-xl shadow-sm p-5">
+            <Sec>Avancement global</Sec>
+            <ResponsiveContainer width="100%" height={250}>
+                <BarChart data={RDM.map(p=>({name:p.nom.substring(0,20),prg:p.prg,bud:p.bud/100}))} layout="vertical">
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0"/>
+                <XAxis type="number" domain={[0,100]} tick={{fontSize:10}} stroke="#94a3b8"/>
+                <YAxis dataKey="name" type="category" width={140} tick={{fontSize:9}} stroke="#94a3b8"/>
+                <Tooltip/><Bar dataKey="prg" fill="#3b82f6" name="% avancement" radius={[0,4,4,0]}/></BarChart>
+            </ResponsiveContainer>
+        </div>
+    </div>);
+};
+
+// ===== 11. ORGANIGRAMME PAGE =====
+const OrganigrammePage=()=>{
+    return(<div className="slide-enter space-y-6">
+        <div className="bg-white rounded-xl shadow-sm p-6 text-center">
+            <h3 className="text-lg font-bold text-primary mb-1">Direction Générale</h3>
+            <div className="flex justify-center gap-6 mt-3">
+                {ORG.dir.map(d=><div key={d.n} className="org-node bg-primary text-white rounded-xl px-6 py-4 shadow-lg">
+                    <div className="font-bold text-sm">{d.n}</div><div className="text-xs text-blue-200">{d.p}</div>
+                </div>)}
+            </div>
+        </div>
+        <div className="bg-white rounded-xl shadow-sm p-5">
+            <h4 className="text-sm font-bold text-gray-700 mb-3">Support Direction</h4>
+            <div className="flex flex-wrap justify-center gap-3">
+                {ORG.sup.map(s=><div key={s.n} className="org-node bg-gray-100 rounded-lg px-4 py-2.5 text-center text-xs">
+                    <div className="font-semibold">{s.n}</div><div className="text-muted">{s.p}</div>
+                </div>)}
+            </div>
+        </div>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {ORG.dep.map(dep=><div key={dep.nm} className={"org-node bg-white rounded-xl shadow-sm p-4 border-t-4 "+(dep.isNew?"ring-2 ring-green-400 ring-offset-2":"")} style={{borderTopColor:dep.col}}>
+                <div className="flex items-center justify-between mb-2">
+                    <h4 className="font-bold text-sm" style={{color:dep.col}}>{dep.nm}</h4>
+                    {dep.isNew&&<span className="text-[10px] bg-green-500 text-white px-2 py-0.5 rounded-full font-bold animate-pulse">Nouveau !</span>}
+                </div>
+                <div className={"rounded-lg p-2.5 mb-2 "+(dep.isNew?"bg-green-50 border border-green-200":"bg-gray-50")}>
+                    <div className={"font-bold text-sm "+(dep.isNew?"text-green-700":"")}>{dep.r}</div>
+                    <div className="text-xs text-muted">{dep.p}</div>
+                </div>
+                {dep.eq.length>0&&<div className="space-y-1 mt-2">
+                    {dep.eq.map(e=><div key={e.n} className="flex items-center gap-2 text-xs p-1.5 bg-gray-50 rounded">
+                        <div className="w-6 h-6 rounded-full flex items-center justify-center text-white text-[10px] font-bold" style={{background:dep.col}}>{e.n.split(' ').map(w=>w[0]).join('')}</div>
+                        <div><span className="font-medium">{e.n}</span><span className="text-muted ml-1">— {e.p}</span></div>
+                    </div>)}
+                </div>}
+                {dep.eq.length===0&&!dep.isNew&&<div className="text-xs text-muted italic mt-1">Pas de collaborateur direct</div>}
+            </div>)}
+        </div>
+        <div className="bg-white rounded-xl shadow-sm p-4 text-center text-xs text-muted">
+            <strong>{ORG.dep.reduce((s,d)=>s+1+d.eq.length,0)+ORG.dir.length+ORG.sup.length}</strong> collaborateurs siège · <strong>14</strong> directeurs d'établissement · <strong>~180</strong> ETP exploitation
+        </div>
+    </div>);
+};
+
+// ===== APP COMPONENT =====
+const App=()=>{
+    const [tab,setTab]=useState("daily");
+    const totalCH=H.reduce((s,h)=>s+h.ch,0);
+    const totalCA=H.reduce((s,h)=>s+h.ca,0);
+    const pages={daily:DailyPage,groupe:GroupePage,global:GlobalePage,tresorerie:TresoreriePage,hotellerie:HotelierePage,couts:CoutsPage,immobilier:ImmobilierePage,budget:BudgetPage,etablissements:EtablissementsPage,roadmap:RoadmapPage,organigramme:OrganigrammePage};
+    const Page=pages[tab]||DailyPage;
+    return(
+    <div className="min-h-screen bg-gray-50">
+        <header className="gradient-header text-white py-4 no-print">
+            <div className="max-w-7xl mx-auto px-4">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h1 className="text-xl font-bold tracking-tight">Heintz Immobilier & Hôtellerie</h1>
+                        <p className="text-blue-200 text-xs mt-0.5">Dashboard de Contrôle de Gestion — V3</p>
+                    </div>
+                    <div className="hidden sm:flex gap-5 text-xs">
+                        <div className="text-center"><span className="block text-blue-200">Hôtels</span><span className="text-lg font-bold">{H.length}</span></div>
+                        <div className="text-center"><span className="block text-blue-200">Chambres</span><span className="text-lg font-bold">{fmt(totalCH)}</span></div>
+                        <div className="text-center"><span className="block text-blue-200">CA Hôtelier</span><span className="text-lg font-bold">{fM(totalCA)}</span></div>
+                        <div className="text-center"><span className="block text-blue-200">Patrimoine</span><span className="text-lg font-bold">{fM(IMM.val)}</span></div>
                     </div>
                 </div>
             </div>
-        );
-    };
+        </header>
+        <Nav tab={tab} set={setTab}/>
+        <main className="max-w-7xl mx-auto px-4 py-6"><Page/></main>
+        <footer className="text-center py-4 text-xs text-muted no-print border-t border-gray-200 mt-8">
+            Heintz Immobilier & Hôtellerie — Dashboard CDG V3 — Données plaquette 10/10/2025 · {TODAY.toLocaleDateString('fr-FR')}
+        </footer>
+    </div>);
+};
 
-    // =====================================================
-    // 3. VUE HÔTELIÈRE
-    // =====================================================
-
-    const HotelierePage = () => {
-        const avgADR = (HOTELS.reduce((s, h) => s + h.adr, 0) / HOTELS.length).toFixed(0);
-        const avgGOPPAR = (HOTELS.reduce((s, h) => s + h.goppar, 0) / HOTELS.length).toFixed(1);
-        const avgCout = (HOTELS.reduce((s, h) => s + h.coutChambre, 0) / HOTELS.length).toFixed(0);
-        const totalCap = HOTELS.reduce((s, h) => s + h.chambres, 0);
-        const sorted = [...HOTELS].sort((a, b) => b.goppar - a.goppar);
-
-        const chartData = sorted.map(h => ({ name: h.name.replace("Campanile Jouy-aux-Arches", "Camp. Jouy").replace("Première Classe Freyming", "PC Freyming").replace("Première Classe Jouy", "PC Jouy").replace("Ibis Budget Sarrebourg", "IB Sarrebourg").replace("Ibis Budget Forbach", "IB Forbach").replace("Ibis Budget Metz", "IB Metz").replace("Ibis Styles Sarrebourg", "IS Sarrebourg").replace("Ibis Styles Châlons", "IS Châlons").replace("Ibis Styles Metz", "IS Metz").replace("Ibis Metz Centre", "Ibis Metz").replace("Ibis Châlons", "Ibis Châlons").replace("Mercure Metz Centre", "Mercure Metz").replace("Campanile Metz", "Camp. Metz").replace("B&B Thionville", "B&B Thionv."), goppar: h.goppar, revpar: h.revpar }));
-
-        const handleExport = () => {
-            exportToExcel(sorted.map(h => ({
-                "Hôtel": h.name, "Chambres": h.chambres, "Étoiles": h.etoiles,
-                "TO (%)": h.to, "ADR (€)": h.adr, "RevPAR (€)": h.revpar,
-                "GOPPAR (€)": h.goppar, "Coût/ch (€)": h.coutChambre, "CA (K€)": h.ca
-            })), "Heintz_Hotellerie", "Performance");
-        };
-
-        return (
-            <div className="space-y-6">
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                    <KPICard label="ADR Moyen" value={avgADR + " €"} trend={4.3} trendLabel="%" color="primary" icon={Icons.cash} />
-                    <KPICard label="GOPPAR Moyen" value={avgGOPPAR + " €"} trend={6.1} trendLabel="%" color="success" icon={Icons.up} />
-                    <KPICard label="Coût / Chambre" value={avgCout + " €"} trend={-1.8} trendLabel="%" color="secondary" icon={Icons.down} />
-                    <KPICard label="Capacité Totale" value={fmt(totalCap)} unit="chambres" trend={null} color="primary" icon={Icons.hotel} />
-                </div>
-
-                <div className="bg-white rounded-xl p-5 shadow-sm">
-                    <SectionTitle right={<ExportButton onClick={handleExport} />}>
-                        Comparatif GOPPAR & RevPAR par Hôtel
-                    </SectionTitle>
-                    <ResponsiveContainer width="100%" height={480}>
-                        <BarChart data={chartData} layout="vertical" margin={{ left: 100 }}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                            <XAxis type="number" tick={{ fontSize: 11 }} tickFormatter={v => v + " €"} />
-                            <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} width={95} />
-                            <Tooltip formatter={(v) => v + " €"} />
-                            <Legend />
-                            <Bar dataKey="goppar" name="GOPPAR" fill="#1e3a5f" radius={[0,4,4,0]} barSize={12} />
-                            <Bar dataKey="revpar" name="RevPAR" fill="#d4a853" radius={[0,4,4,0]} barSize={12} />
-                        </BarChart>
-                    </ResponsiveContainer>
-                </div>
-
-                <div className="bg-white rounded-xl p-5 shadow-sm">
-                    <SectionTitle>Performance Détaillée — Tous Hôtels</SectionTitle>
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-sm">
-                            <thead>
-                                <tr className="border-b-2 border-gray-200">
-                                    <th className="text-left py-3 px-2 font-semibold text-muted">Hôtel</th>
-                                    <th className="text-center py-3 px-2 font-semibold text-muted">★</th>
-                                    <th className="text-right py-3 px-2 font-semibold text-muted">Ch.</th>
-                                    <th className="text-right py-3 px-2 font-semibold text-muted">TO</th>
-                                    <th className="text-right py-3 px-2 font-semibold text-muted">ADR</th>
-                                    <th className="text-right py-3 px-2 font-semibold text-muted">RevPAR</th>
-                                    <th className="text-right py-3 px-2 font-semibold text-primary">GOPPAR</th>
-                                    <th className="text-right py-3 px-2 font-semibold text-muted">Coût/ch</th>
-                                    <th className="text-right py-3 px-2 font-semibold text-muted">CA</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {sorted.map((h, i) => (
-                                    <tr key={h.id} className="border-b border-gray-50 hover:bg-gray-50">
-                                        <td className="py-2 px-2 font-medium">{h.name}</td>
-                                        <td className="py-2 px-2 text-center text-secondary text-xs">{"★".repeat(h.etoiles)}</td>
-                                        <td className="py-2 px-2 text-right">{h.chambres}</td>
-                                        <td className="py-2 px-2 text-right">{h.to}%</td>
-                                        <td className="py-2 px-2 text-right">{fmtEur(h.adr)}</td>
-                                        <td className="py-2 px-2 text-right">{fmtEur(h.revpar)}</td>
-                                        <td className="py-2 px-2 text-right font-bold text-primary">{fmtEur(h.goppar)}</td>
-                                        <td className="py-2 px-2 text-right">{fmtEur(h.coutChambre)}</td>
-                                        <td className="py-2 px-2 text-right">{fmtK(h.ca)}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        );
-    };
-
-    // =====================================================
-    // 4. VUE IMMOBILIÈRE
-    // =====================================================
-
-    const ImmobilierePage = () => {
-        const d = IMMOBILIER;
-        const handleExport = () => {
-            const data = [
-                { Indicateur: "Surface (m²)", Valeur: d.surface },
-                { Indicateur: "Valeur (K€)", Valeur: d.valeur },
-                { Indicateur: "Loyers nets (K€)", Valeur: d.loyersNets },
-                { Indicateur: "Taux de capitalisation (%)", Valeur: d.tauxCap },
-                { Indicateur: "LTV (%)", Valeur: d.ltv },
-                { Indicateur: "Dettes (K€)", Valeur: d.dettes },
-                { Indicateur: "DSCR (%)", Valeur: d.dscr }
-            ];
-            exportToExcel(data, "Heintz_Immobilier", "KPIs");
-        };
-
-        return (
-            <div className="space-y-6">
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                    <KPICard label="Surface" value={fmt(d.surface)} unit="m²" color="primary" icon={Icons.building} />
-                    <KPICard label="Valeur Patrimoine" value={fmtM(d.valeur)} color="secondary" icon={Icons.cash} />
-                    <KPICard label="Loyers Nets" value={fmtM(d.loyersNets)} color="success" icon={Icons.cash} />
-                    <KPICard label="Taux Capitalisation" value={fmtPct(d.tauxCap)} color="primary" icon={Icons.up} />
-                </div>
-                <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-                    <KPICard label="LTV" value={d.ltv + "%"} color="warning" icon={Icons.alert} />
-                    <KPICard label="Dettes" value={fmtM(d.dettes)} color="danger" icon={Icons.down} />
-                    <KPICard label="DSCR" value={d.dscr + "%"} color="success" icon={Icons.up} />
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div className="bg-white rounded-xl p-5 shadow-sm">
-                        <SectionTitle right={<ExportButton onClick={handleExport} />}>
-                            Répartition par Type d'Actif
-                        </SectionTitle>
-                        <ResponsiveContainer width="100%" height={300}>
-                            <PieChart>
-                                <Pie data={d.parType} cx="50%" cy="50%" innerRadius={60} outerRadius={100} dataKey="value" label={({ name, value }) => `${name} ${value}%`} labelLine={true}>
-                                    {d.parType.map((s, i) => <Cell key={i} fill={s.color} />)}
-                                </Pie>
-                                <Tooltip formatter={(v) => v + "%"} />
-                            </PieChart>
-                        </ResponsiveContainer>
-                    </div>
-
-                    <div className="bg-white rounded-xl p-5 shadow-sm">
-                        <SectionTitle>Répartition par Type de Client</SectionTitle>
-                        <ResponsiveContainer width="100%" height={300}>
-                            <BarChart data={d.parClient} layout="vertical" margin={{ left: 100 }}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                                <XAxis type="number" tick={{ fontSize: 11 }} tickFormatter={v => v + "%"} />
-                                <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} width={95} />
-                                <Tooltip formatter={(v) => v + "%"} />
-                                <Bar dataKey="value" name="Part" radius={[0,6,6,0]} barSize={20}>
-                                    {d.parClient.map((s, i) => <Cell key={i} fill={s.color} />)}
-                                </Bar>
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </div>
-                </div>
-            </div>
-        );
-    };
-
-    // =====================================================
-    // 5. VUE BUDGET 2026
-    // =====================================================
-
-    const BudgetPage = () => {
-        const b = BUDGET_2026;
-        const handleExport = () => {
-            const rows = [];
-            rows.push({ Catégorie: "REVENUS", "Sous-catégorie": "", Détail: "", "Montant (K€)": b.revenus.total });
-            b.revenus.hebergement.details.forEach(d => rows.push({ Catégorie: "Hébergement", "Sous-catégorie": d.label, Détail: "", "Montant (K€)": d.montant }));
-            b.revenus.fb.details.forEach(d => rows.push({ Catégorie: "F&B", "Sous-catégorie": d.label, Détail: "", "Montant (K€)": d.montant }));
-            b.revenus.autres.details.forEach(d => rows.push({ Catégorie: "Autres revenus", "Sous-catégorie": d.label, Détail: "", "Montant (K€)": d.montant }));
-            rows.push({ Catégorie: "", "Sous-catégorie": "", Détail: "", "Montant (K€)": "" });
-            rows.push({ Catégorie: "CHARGES", "Sous-catégorie": "", Détail: "", "Montant (K€)": b.charges.total });
-            b.charges.details.forEach(d => rows.push({ Catégorie: "Charges", "Sous-catégorie": d.label, Détail: d.pct + "%", "Montant (K€)": d.montant }));
-            rows.push({ Catégorie: "", "Sous-catégorie": "", Détail: "", "Montant (K€)": "" });
-            rows.push({ Catégorie: "CAPEX", "Sous-catégorie": "", Détail: "", "Montant (K€)": b.capex.total });
-            b.capex.details.forEach(d => rows.push({ Catégorie: "CAPEX", "Sous-catégorie": d.label, Détail: "", "Montant (K€)": d.montant }));
-            rows.push({ Catégorie: "", "Sous-catégorie": "", Détail: "", "Montant (K€)": "" });
-            rows.push({ Catégorie: "GOP", "Sous-catégorie": "", Détail: "", "Montant (K€)": b.gop });
-            rows.push({ Catégorie: "Résultat Net", "Sous-catégorie": "", Détail: "", "Montant (K€)": b.resultatNet });
-            exportToExcel(rows, "Heintz_Budget_2026", "Budget");
-        };
-
-        const BudgetBlock = ({ title, color, total, children }) => (
-            <div className={`bg-white rounded-xl shadow-sm overflow-hidden border-t-4`} style={{ borderTopColor: color }}>
-                <div className="p-4 border-b border-gray-100">
-                    <div className="text-sm font-medium text-muted">{title}</div>
-                    <div className="text-2xl font-bold" style={{ color }}>{fmtK(total)}</div>
-                </div>
-                <div className="p-4 space-y-2">{children}</div>
-            </div>
-        );
-
-        const BudgetLine = ({ label, montant, sub, pct }) => (
-            <div className={`flex justify-between items-center ${sub ? 'pl-4 text-sm' : 'font-semibold'}`}>
-                <span className={sub ? 'text-muted' : 'text-gray-800'}>{label}</span>
-                <div className="flex items-center gap-2">
-                    {pct && <span className="text-xs text-muted">({pct}%)</span>}
-                    <span className={sub ? 'text-muted' : 'font-semibold'}>{fmtK(montant)}</span>
-                </div>
-            </div>
-        );
-
-        return (
-            <div className="space-y-6">
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                    <KPICard label="Revenus Totaux" value={fmtK(b.revenus.total)} color="success" icon={Icons.up} />
-                    <KPICard label="Charges Totales" value={fmtK(b.charges.total + b.capex.total)} color="danger" icon={Icons.down} />
-                    <KPICard label="GOP" value={fmtK(b.gop)} color="primary" icon={Icons.cash} />
-                    <KPICard label="Résultat Net" value={fmtK(b.resultatNet)} color="secondary" icon={Icons.cash} />
-                </div>
-
-                <div className="flex justify-end">
-                    <ExportButton onClick={handleExport} />
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <BudgetBlock title="Revenus" color="#10b981" total={b.revenus.total}>
-                        <BudgetLine label="Hébergement" montant={b.revenus.hebergement.total} />
-                        {b.revenus.hebergement.details.map((d, i) => <BudgetLine key={i} label={d.label} montant={d.montant} sub />)}
-                        <div className="border-t border-gray-100 pt-2 mt-2" />
-                        <BudgetLine label="F&B" montant={b.revenus.fb.total} />
-                        {b.revenus.fb.details.map((d, i) => <BudgetLine key={i} label={d.label} montant={d.montant} sub />)}
-                        <div className="border-t border-gray-100 pt-2 mt-2" />
-                        <BudgetLine label="Autres" montant={b.revenus.autres.total} />
-                        {b.revenus.autres.details.map((d, i) => <BudgetLine key={i} label={d.label} montant={d.montant} sub />)}
-                    </BudgetBlock>
-
-                    <BudgetBlock title="Charges d'Exploitation" color="#ef4444" total={b.charges.total}>
-                        {b.charges.details.map((d, i) => (
-                            <div key={i}>
-                                <BudgetLine label={d.label} montant={d.montant} pct={d.pct} />
-                                <div className="mt-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-                                    <div className="h-full bg-red-400 rounded-full progress-bar" style={{ width: d.pct + "%" }} />
-                                </div>
-                            </div>
-                        ))}
-                    </BudgetBlock>
-
-                    <BudgetBlock title="CAPEX" color="#f59e0b" total={b.capex.total}>
-                        {b.capex.details.map((d, i) => (
-                            <div key={i}>
-                                <BudgetLine label={d.label} montant={d.montant} />
-                                <div className="mt-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-                                    <div className="h-full bg-amber-400 rounded-full progress-bar" style={{ width: ((d.montant / b.capex.total) * 100) + "%" }} />
-                                </div>
-                            </div>
-                        ))}
-                    </BudgetBlock>
-                </div>
-
-                <div className="bg-white rounded-xl p-5 shadow-sm">
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="p-4 rounded-lg bg-blue-50 border border-blue-200 text-center">
-                            <div className="text-sm text-blue-600 font-medium">GOP (Gross Operating Profit)</div>
-                            <div className="text-3xl font-bold text-blue-800 mt-1">{fmtK(b.gop)}</div>
-                            <div className="text-xs text-blue-500 mt-1">Marge GOP : {((b.gop / b.revenus.total) * 100).toFixed(1)}%</div>
-                        </div>
-                        <div className="p-4 rounded-lg bg-green-50 border border-green-200 text-center">
-                            <div className="text-sm text-green-600 font-medium">Résultat Net</div>
-                            <div className="text-3xl font-bold text-green-800 mt-1">{fmtK(b.resultatNet)}</div>
-                            <div className="text-xs text-green-500 mt-1">Marge nette : {((b.resultatNet / b.revenus.total) * 100).toFixed(1)}%</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    };
-
-    // =====================================================
-    // 6. VUE ÉTABLISSEMENTS (Carte Leaflet)
-    // =====================================================
-
-    const EtablissementsPage = () => {
-        const mapRef = useRef(null);
-        const mapInstance = useRef(null);
-        const markersRef = useRef([]);
-        const [selectedHotel, setSelectedHotel] = useState(null);
-
-        useEffect(() => {
-            if (mapInstance.current) return;
-            const map = L.map(mapRef.current, { scrollWheelZoom: true }).setView([49.0, 6.2], 8);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap'
-            }).addTo(map);
-
-            HOTELS.forEach(h => {
-                const marker = L.circleMarker([h.lat, h.lng], {
-                    radius: Math.max(6, Math.sqrt(h.ca) / 3),
-                    fillColor: h.etoiles >= 4 ? '#1e3a5f' : h.etoiles >= 3 ? '#d4a853' : h.etoiles >= 2 ? '#64748b' : '#94a3b8',
-                    color: '#fff',
-                    weight: 2,
-                    fillOpacity: 0.85
-                }).addTo(map);
-                marker.bindTooltip(`<b>${h.name}</b><br/>${h.chambres} ch. — ${h.etoiles}★<br/>CA : ${fmt(h.ca)} K€`, { direction: 'top', offset: [0, -8] });
-                marker.on('click', () => setSelectedHotel(h));
-                markersRef.current.push({ marker, hotel: h });
-            });
-
-            mapInstance.current = map;
-            setTimeout(() => map.invalidateSize(), 100);
-
-            return () => { map.remove(); mapInstance.current = null; };
-        }, []);
-
-        useEffect(() => {
-            if (selectedHotel && mapInstance.current) {
-                mapInstance.current.setView([selectedHotel.lat, selectedHotel.lng], 13, { animate: true });
-            }
-        }, [selectedHotel]);
-
-        const handleExport = () => {
-            exportToExcel(HOTELS.map(h => ({
-                "Hôtel": h.name, "Étoiles": h.etoiles, "Chambres": h.chambres,
-                "CA (K€)": h.ca, "TO (%)": h.to, "ADR (€)": h.adr,
-                "RevPAR (€)": h.revpar, "GOPPAR (€)": h.goppar,
-                "Latitude": h.lat, "Longitude": h.lng, "Directeur": h.directeur
-            })), "Heintz_Etablissements", "Hôtels");
-        };
-
-        return (
-            <div className="space-y-6">
-                <div className="flex justify-end">
-                    <ExportButton onClick={handleExport} />
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div className="lg:col-span-2">
-                        <div ref={mapRef} style={{ height: 500 }} className="rounded-xl shadow-sm border border-gray-200" />
-                        <div className="flex items-center gap-4 mt-3 text-xs text-muted">
-                            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-primary inline-block" /> 4★</span>
-                            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-secondary inline-block" /> 3★</span>
-                            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-gray-500 inline-block" /> 2★</span>
-                            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-gray-400 inline-block" /> 1★</span>
-                            <span className="ml-2">Taille = CA proportionnel</span>
-                        </div>
-                    </div>
-
-                    <div className="bg-white rounded-xl shadow-sm p-5 overflow-y-auto" style={{ maxHeight: 540 }}>
-                        {selectedHotel ? (
-                            <div>
-                                <button onClick={() => setSelectedHotel(null)} className="text-xs text-primary hover:underline mb-3">← Tous les hôtels</button>
-                                <h3 className="text-lg font-bold text-gray-900">{selectedHotel.name}</h3>
-                                <div className="text-sm text-secondary mb-3">{"★".repeat(selectedHotel.etoiles)} — {selectedHotel.chambres} chambres</div>
-                                <div className="space-y-3 text-sm">
-                                    <div className="p-3 bg-gray-50 rounded-lg">
-                                        <div className="font-semibold text-muted text-xs mb-1">DIRECTION</div>
-                                        <div>{selectedHotel.directeur}</div>
-                                        <div className="text-muted">{selectedHotel.tel}</div>
-                                    </div>
-                                    <div className="p-3 bg-gray-50 rounded-lg">
-                                        <div className="font-semibold text-muted text-xs mb-1">PERFORMANCE</div>
-                                        <div className="grid grid-cols-2 gap-2 mt-1">
-                                            <div><span className="text-muted">CA :</span> <b>{fmtK(selectedHotel.ca)}</b></div>
-                                            <div><span className="text-muted">TO :</span> <b>{selectedHotel.to}%</b></div>
-                                            <div><span className="text-muted">ADR :</span> <b>{fmtEur(selectedHotel.adr)}</b></div>
-                                            <div><span className="text-muted">RevPAR :</span> <b>{fmtEur(selectedHotel.revpar)}</b></div>
-                                            <div><span className="text-muted">GOPPAR :</span> <b className="text-primary">{fmtEur(selectedHotel.goppar)}</b></div>
-                                            <div><span className="text-muted">Coût/ch :</span> <b>{fmtEur(selectedHotel.coutChambre)}</b></div>
-                                        </div>
-                                    </div>
-                                    <div className="p-3 bg-gray-50 rounded-lg">
-                                        <div className="font-semibold text-muted text-xs mb-1">ÉQUIPEMENTS</div>
-                                        <div className="flex flex-wrap gap-1 mt-1">
-                                            {selectedHotel.equip.map((e, i) => (
-                                                <span key={i} className="px-2 py-0.5 bg-white border border-gray-200 rounded text-xs">{e}</span>
-                                            ))}
-                                        </div>
-                                    </div>
-                                    {selectedHotel.certif.length > 0 && (
-                                        <div className="p-3 bg-green-50 rounded-lg">
-                                            <div className="font-semibold text-green-700 text-xs mb-1">CERTIFICATIONS</div>
-                                            <div className="flex flex-wrap gap-1 mt-1">
-                                                {selectedHotel.certif.map((c, i) => (
-                                                    <span key={i} className="px-2 py-0.5 bg-green-100 text-green-700 rounded text-xs font-medium">{c}</span>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        ) : (
-                            <div>
-                                <h3 className="text-base font-bold text-gray-900 mb-3">Sélectionnez un hôtel</h3>
-                                <p className="text-sm text-muted mb-4">Cliquez sur un marqueur ou une carte ci-dessous</p>
-                                <div className="grid grid-cols-1 gap-2 text-sm">
-                                    {HOTELS.map(h => (
-                                        <div key={h.id} className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 cursor-pointer" onClick={() => setSelectedHotel(h)}>
-                                            <span className="text-secondary text-xs">{"★".repeat(h.etoiles)}</span>
-                                            <span className="font-medium flex-1 truncate">{h.name}</span>
-                                            <span className="text-muted">{h.chambres} ch.</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-                    {HOTELS.map(h => (
-                        <div
-                            key={h.id}
-                            className={`hotel-card bg-white rounded-xl p-4 shadow-sm border-2 ${selectedHotel?.id === h.id ? 'border-secondary shadow-md' : 'border-transparent'}`}
-                            onClick={() => setSelectedHotel(h)}
-                        >
-                            <div className="text-xs text-secondary font-medium">{"★".repeat(h.etoiles)}</div>
-                            <div className="font-semibold text-sm mt-1 leading-tight">{h.name}</div>
-                            <div className="text-xs text-muted mt-1">{h.chambres} chambres</div>
-                            <div className="flex justify-between items-center mt-2 pt-2 border-t border-gray-100">
-                                <span className="text-xs text-muted">CA</span>
-                                <span className="text-sm font-bold text-primary">{fmtK(h.ca)}</span>
-                            </div>
-                            <div className="flex justify-between items-center mt-1">
-                                <span className="text-xs text-muted">TO</span>
-                                <span className="text-sm font-medium">{h.to}%</span>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
-        );
-    };
-
-    // =====================================================
-    // 7. VUE ROADMAP
-    // =====================================================
-
-    const RoadmapPage = () => {
-        const projetsActifs = ROADMAP.filter(p => p.statut === "En cours").length;
-        const budgetTotal = ROADMAP.reduce((s, p) => s + p.budget, 0);
-        const depenseTotal = ROADMAP.reduce((s, p) => s + p.depense, 0);
-        const avgProgress = Math.round(ROADMAP.reduce((s, p) => s + p.progress, 0) / ROADMAP.length);
-
-        const handleExport = () => {
-            exportToExcel(ROADMAP.map(p => ({
-                "Projet": p.nom, "Type": p.type, "Statut": p.statut,
-                "Budget (K€)": p.budget, "Dépensé (K€)": p.depense,
-                "Avancement (%)": p.progress, "Responsable": p.responsable,
-                "Échéance": p.echeance, "Risques": p.risque || "—"
-            })), "Heintz_Roadmap", "Projets");
-        };
-
-        const statusColor = (s) => {
-            if (s === "En cours") return "#3b82f6";
-            if (s === "Planifié") return "#94a3b8";
-            if (s === "Étude") return "#8b5cf6";
-            return "#10b981";
-        };
-
-        return (
-            <div className="space-y-6">
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                    <KPICard label="Projets Actifs" value={projetsActifs} color="primary" icon={Icons.roadmap} />
-                    <KPICard label="Budget Total" value={fmtK(budgetTotal)} color="secondary" icon={Icons.cash} />
-                    <KPICard label="Dépensé" value={fmtK(depenseTotal)} color="warning" icon={Icons.down} />
-                    <KPICard label="Avancement Moyen" value={avgProgress + "%"} color="success" icon={Icons.up} />
-                </div>
-
-                <div className="flex justify-end">
-                    <ExportButton onClick={handleExport} />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {ROADMAP.map(p => (
-                        <div key={p.id} className="bg-white rounded-xl shadow-sm overflow-hidden">
-                            <div className="p-5">
-                                <div className="flex items-start justify-between mb-3">
-                                    <div>
-                                        <h3 className="font-bold text-gray-900">{p.nom}</h3>
-                                        <span className="text-xs text-muted">{p.type}</span>
-                                    </div>
-                                    <StatusBadge statut={p.statut} />
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-3 text-sm mb-4">
-                                    <div>
-                                        <span className="text-muted text-xs">Budget</span>
-                                        <div className="font-semibold">{fmtK(p.budget)}</div>
-                                    </div>
-                                    <div>
-                                        <span className="text-muted text-xs">Dépensé</span>
-                                        <div className="font-semibold">{fmtK(p.depense)}</div>
-                                    </div>
-                                    <div>
-                                        <span className="text-muted text-xs">Responsable</span>
-                                        <div className="font-medium">{p.responsable}</div>
-                                    </div>
-                                    <div>
-                                        <span className="text-muted text-xs">Échéance</span>
-                                        <div className="font-medium">{p.echeance}</div>
-                                    </div>
-                                </div>
-
-                                <div className="mb-2">
-                                    <div className="flex justify-between text-xs mb-1">
-                                        <span className="text-muted">Avancement</span>
-                                        <span className="font-semibold">{p.progress}%</span>
-                                    </div>
-                                    <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                                        <div
-                                            className="h-full rounded-full progress-bar"
-                                            style={{ width: p.progress + "%", backgroundColor: statusColor(p.statut) }}
-                                        />
-                                    </div>
-                                </div>
-
-                                {p.risque && (
-                                    <div className="flex items-center gap-2 mt-3 p-2 bg-red-50 rounded-lg text-xs text-red-700">
-                                        {Icons.alert}
-                                        <span className="font-medium">Risque : {p.risque}</span>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
-        );
-    };
-
-    // =====================================================
-    // APP
-    // =====================================================
-
-    const App = () => {
-        const [activeTab, setActiveTab] = useState("global");
-
-        const renderPage = () => {
-            switch (activeTab) {
-                case "global": return <GlobalePage />;
-                case "tresorerie": return <TresoreriePage />;
-                case "hotellerie": return <HotelierePage />;
-                case "immobilier": return <ImmobilierePage />;
-                case "budget": return <BudgetPage />;
-                case "etablissements": return <EtablissementsPage />;
-                case "roadmap": return <RoadmapPage />;
-                default: return <GlobalePage />;
-            }
-        };
-
-        const currentTab = TABS.find(t => t.id === activeTab);
-
-        return (
-            <div className="min-h-screen">
-                {/* Header */}
-                <header className="gradient-header text-white">
-                    <div className="max-w-7xl mx-auto px-4 py-4">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                                <div className="w-10 h-10 bg-white bg-opacity-20 rounded-lg flex items-center justify-center text-xl font-bold">H</div>
-                                <div>
-                                    <h1 className="text-lg font-bold">Heintz Dashboard</h1>
-                                    <p className="text-xs text-blue-200">Contrôle de Gestion — Immobilier & Hôtellerie</p>
-                                </div>
-                            </div>
-                            <div className="hidden md:flex items-center gap-6 text-sm">
-                                <div className="text-center">
-                                    <div className="text-blue-200 text-xs">Hôtels</div>
-                                    <div className="font-bold">14</div>
-                                </div>
-                                <div className="text-center">
-                                    <div className="text-blue-200 text-xs">Chambres</div>
-                                    <div className="font-bold">1 004</div>
-                                </div>
-                                <div className="text-center">
-                                    <div className="text-blue-200 text-xs">CA 2025</div>
-                                    <div className="font-bold">21,5 M€</div>
-                                </div>
-                                <div className="text-center">
-                                    <div className="text-blue-200 text-xs">Patrimoine</div>
-                                    <div className="font-bold">41,4 M€</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </header>
-
-                {/* Navigation */}
-                <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
-
-                {/* Content */}
-                <main className="max-w-7xl mx-auto px-4 py-6">
-                    <div className="mb-4">
-                        <h2 className="text-xl font-bold text-gray-900">{currentTab?.label}</h2>
-                    </div>
-                    {renderPage()}
-                </main>
-
-                {/* Footer */}
-                <footer className="border-t border-gray-200 mt-8 py-4 text-center text-xs text-muted">
-                    Heintz Immobilier & Hôtellerie — Dashboard Contrôle de Gestion — Jérôme SCAT — 2025
-                </footer>
-            </div>
-        );
-    };
-
-    // =====================================================
-    // RENDER
-    // =====================================================
-
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<App />);
-    </script>
+ReactDOM.render(<App/>, document.getElementById('root'));
+</script>
 </body>
 </html>
