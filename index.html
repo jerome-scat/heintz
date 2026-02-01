@@ -1428,7 +1428,8 @@ const PilotagePage=()=>{
     const bfrK=Math.round(bfrJ*caJour/1000);
 
     // --- Écarts Prix / Volume ---
-    const epv={caN:21540,caN1:19600,var:1940,prix:890,volume:780,perimetre:270};
+    // Consolidé N vs N-1 (PNL.conso TOTAL PRODUITS)
+    const epv={caN:24740,caN1:19600,var:5140,prix:950,volume:1350,perimetre:2840};
 
     // --- Rolling Forecast ---
     const rfData=useMemo(()=>{
@@ -1553,7 +1554,7 @@ const PilotagePage=()=>{
                     </div>)}
                 </div>
                 <div className="mt-3 p-2 bg-green-50 rounded-lg text-[10px] text-green-700">
-                    <strong>Croissance organique : +{fK(epv.prix+epv.volume)}</strong> ({((epv.prix+epv.volume)/epv.caN1*100).toFixed(1)}%) — Effet prix dominant, bonne maîtrise du yield management
+                    <strong>Croissance organique : +{fK(epv.prix+epv.volume)}</strong> ({((epv.prix+epv.volume)/epv.caN1*100).toFixed(1)}%) — Croissance équilibrée prix/volume, relais de croissance externe (+{fK(epv.perimetre)})
                 </div>
             </div>
         </div>
@@ -1703,7 +1704,7 @@ const App=()=>{
     const totalCH=H.reduce((s,h)=>s+h.ch,0);
     const totalCA=H.reduce((s,h)=>s+h.ca,0);
     const pages={synthese:SynthesePage,pnl:PnlCompletPage,tresorerie:TresoreriePage,pilotage:PilotagePage,immobilier:ImmobilierePage,etablissements:EtablissementsPage,budget:BudgetProjetsPage,rse:RsePage,organigramme:OrganigrammePage};
-    const Page=pages[tab]||DailyPage;
+    const Page=pages[tab]||SynthesePage;
     return(
     <div className="min-h-screen bg-gray-50">
         <header className="gradient-header text-white py-4 no-print">
