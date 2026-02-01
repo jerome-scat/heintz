@@ -191,7 +191,8 @@ const RDM=[
     {id:5,nom:"PMS unifié",typ:"IT",bud:450,dep:279,prg:62,resp:"Guillaume Gervasoni",ech:"Q1 2026",rsk:"Formation équipes",st:"En cours",ch:null,caP:null},
     {id:6,nom:"Certifications Clef Verte",typ:"RSE",bud:80,dep:45,prg:56,resp:"Tristan Abisse",ech:"Q2 2026",rsk:null,st:"En cours",ch:null,caP:null},
     {id:7,nom:"Dashboards Power BI",typ:"IT",bud:120,dep:0,prg:0,resp:"—",ech:"Q1 2026",rsk:null,st:"Planifié",ch:null,caP:null},
-    {id:8,nom:"Acquisition Nancy",typ:"Acquisition",bud:6500,dep:975,prg:15,resp:"André Heintz",ech:"2026",rsk:"Financement, concurrence",st:"Étude",ch:null,caP:null}
+    {id:8,nom:"Acquisition Nancy",typ:"Acquisition",bud:6500,dep:975,prg:15,resp:"André Heintz",ech:"2026",rsk:"Financement, concurrence",st:"Étude",ch:null,caP:null},
+    {id:9,nom:"Recrutement Juriste droit des sociétés",typ:"RH",bud:60,dep:0,prg:0,resp:"Audrey Aubry",ech:"2026",rsk:null,st:"Planifié",ch:null,caP:null}
 ];
 
 // ========== Organigramme ==========
@@ -204,9 +205,8 @@ const ORG={
         {nm:"Ressources Humaines",r:"Audrey Aubry",p:"Directrice RH",eq:[{n:"Camille Lachaise",p:"Gestionnaire RH"},{n:"Julie Hénault",p:"Gestionnaire RH"}],col:"#8b5cf6"},
         {nm:"Juridique",r:"Poste à pourvoir",p:"Juriste droit des sociétés",eq:[],col:"#94a3b8"},
         {nm:"Comptabilité & Finance",r:"Christine Bastien",p:"Resp. comptabilité",eq:[{n:"Sophie Cholewa",p:"Réviseur"},{n:"Alexis Pauly",p:"Asst. réviseur"},{n:"Saban Sivri",p:"Compta invest."},{n:"Audrey Faure",p:"Comptable"},{n:"Sasha Titren",p:"Comptable"},{n:"Renée Konter",p:"Comptable"},{n:"Marie Pinthon",p:"Comptable"},{n:"Eva Casella",p:"Apprentie"}],col:"#ef4444"},
-        {nm:"Contrôle de Gestion",r:"Jérôme SCAT",p:"Contrôleur de Gestion",eq:[],col:"#10b981",isNew:true},
         {nm:"Communication",r:"Sandrine Bondon",p:"Resp. communication",eq:[],col:"#f59e0b"},
-        {nm:"RSE",r:"Tristan Abisse",p:"Responsable RSE",eq:[],col:"#059669"},
+        {nm:"Direction Financière",r:"Tristan Abisse",p:"Responsable Financier",eq:[{n:"Jérôme SCAT",p:"Contrôleur de Gestion",isNew:true}],col:"#10b981",hasNew:true},
         {nm:"Systèmes d'Information",r:"Guillaume Gervasoni",p:"Resp. informatique",eq:[],col:"#3b82f6"},
         {nm:"Travaux & Agencements",r:"Brice Curti",p:"Dir. technique et travaux",eq:[{n:"Anaïs Lavarino",p:"Assistante"},{n:"Sandra Laheurte",p:"Resp. maintenance"},{n:"David Corbier",p:"Resp. travaux"},{n:"Sylvain Rémy",p:"Resp. technique"},{n:"Stefano Rubortone",p:"Resp. conception"}],col:"#78350f"}
     ]
@@ -764,19 +764,22 @@ const EtablissementsPage=()=>{
     useEffect(()=>{
         if(mInst.current){mInst.current.remove();mInst.current=null;}
         const map=L.map(mRef.current).setView([48.5,5.5],7);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'OpenStreetMap'}).addTo(map);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:''}).addTo(map);
         const mkIcon=(color,label)=>L.divIcon({className:'',html:'<div style="background:'+color+';color:white;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:bold;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,.3)">'+label+'</div>'});
-        H.forEach(h=>{L.marker([h.lat,h.lng],{icon:mkIcon('#1e3a5f',h.e+'★')}).addTo(map).bindPopup('<div style="font-family:Inter,sans-serif;font-size:12px"><strong>'+h.n+'</strong><br/>'+h.v+' · '+h.ch+' ch. · '+h.e+'★<br/>CA: '+fmt(h.ca)+' K€ · TO: '+h.to+'%<br/><em>'+h.prop+'</em></div>');});
+        H.forEach(h=>{L.marker([h.lat,h.lng],{icon:mkIcon('#1e3a5f',h.e+'★')}).addTo(map).bindPopup('<div style="font-family:Inter,sans-serif;font-size:12px;min-width:200px"><strong style="font-size:13px">'+h.n+'</strong><br/><span style="color:#64748b">'+h.v+' · '+h.ch+' chambres · '+h.e+'★</span><hr style="margin:4px 0;border-color:#e2e8f0"/><b>CA:</b> '+fmt(h.ca)+' K€ · <b>TO:</b> '+h.to+'% · <b>RevPAR:</b> '+h.rp+'€<br/><b>ADR:</b> '+h.adr+'€ · <b>GOP:</b> '+h.gp+'%<hr style="margin:4px 0;border-color:#e2e8f0"/><b>Directeur:</b> '+h.dir+'<br/><b>Tél:</b> '+h.tel+'<br/><span style="color:#64748b;font-style:italic">'+h.prop+'</span><br/><span style="color:#64748b;font-size:11px">'+h.eq.join(', ')+'</span></div>');});
         H_NON_EXPL.forEach(h=>{L.marker([h.lat,h.lng],{icon:mkIcon('#94a3b8','M')}).addTo(map).bindPopup('<div style="font-family:Inter,sans-serif;font-size:12px"><strong>'+h.n+'</strong><br/>'+h.v+' · '+h.ch+' ch.<br/>Exploitant: '+h.expl+'<br/>Livraison: '+h.liv+'</div>');});
         PIPELINE.forEach(h=>{L.marker([h.lat,h.lng],{icon:mkIcon('#10b981','P')}).addTo(map).bindPopup('<div style="font-family:Inter,sans-serif;font-size:12px"><strong>'+h.n+'</strong><br/>'+h.v+' · '+h.ch+' ch.<br/>'+h.stat+' — '+h.ech+'<br/>CA prév: '+fmt(h.caP)+' K€</div>');});
+        const immGeo={"Forbach":[49.188,6.905],"Metz":[49.119,6.176],"Metz Amphithéâtre":[49.109,6.183],"Ars-Laquenexy":[49.078,6.285],"Jouy-aux-Arches":[49.065,6.078],"Manom":[49.348,6.159],"Sarreguemines":[49.110,7.069],"Châlons":[48.957,4.363],"Tassin":[45.764,4.762],"Castres":[43.605,2.242]};
+        IMM.actifs.forEach((a,i)=>{const geo=immGeo[a.l];if(geo){L.marker([geo[0]+(i%5-2)*0.003,geo[1]+(Math.floor(i/5)-1)*0.004],{icon:mkIcon('#d4a853','I')}).addTo(map).bindPopup('<div style="font-family:Inter,sans-serif;font-size:12px;min-width:180px"><strong>'+a.t+'</strong><br/><span style="color:#64748b">'+a.l+(a.s>0?' · '+a.s+' m²':'')+'</span><br/><b>Locataire:</b> '+a.loc+'<br/><b>Acquisition:</b> '+a.a+'</div>');}});
         mInst.current=map;
         setTimeout(()=>map.invalidateSize(),200);
     },[]);
     return(<div className="slide-enter space-y-6">
-        <div className="grid grid-cols-3 gap-4 text-center text-xs">
-            <div className="flex items-center justify-center gap-2"><div className="w-4 h-4 rounded-full" style={{background:'#1e3a5f'}}></div><span>Exploités ({H.length})</span></div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center text-xs">
+            <div className="flex items-center justify-center gap-2"><div className="w-4 h-4 rounded-full" style={{background:'#1e3a5f'}}></div><span>Hôtels exploités ({H.length})</span></div>
             <div className="flex items-center justify-center gap-2"><div className="w-4 h-4 rounded-full" style={{background:'#94a3b8'}}></div><span>Murs non exploités ({H_NON_EXPL.length})</span></div>
             <div className="flex items-center justify-center gap-2"><div className="w-4 h-4 rounded-full" style={{background:'#10b981'}}></div><span>Pipeline ({PIPELINE.length})</span></div>
+            <div className="flex items-center justify-center gap-2"><div className="w-4 h-4 rounded-full" style={{background:'#d4a853'}}></div><span>Immobilier ({IMM.actifs.length})</span></div>
         </div>
         <div ref={mRef} style={{height:"520px"}} className="rounded-xl shadow-sm border border-gray-200"></div>
         <div className="bg-white rounded-xl shadow-sm p-4">
@@ -859,24 +862,24 @@ const OrganigrammePage=()=>{
                 </div>)}
             </div>
         </div>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {ORG.dep.map(dep=><div key={dep.nm} className={"org-node bg-white rounded-xl shadow-sm p-4 border-t-4 "+(dep.isNew?"ring-2 ring-green-400 ring-offset-2":"")} style={{borderTopColor:dep.col}}>
-                <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-bold text-sm" style={{color:dep.col}}>{dep.nm}</h4>
-                    {dep.isNew&&<span className="text-[10px] bg-green-500 text-white px-2 py-0.5 rounded-full font-bold animate-pulse">Nouveau !</span>}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+            {ORG.dep.map(dep=>{const hl=dep.isNew||dep.hasNew;return <div key={dep.nm} className={"org-node bg-white rounded-xl shadow-sm p-3 border-t-4 "+(hl?"ring-2 ring-green-400 ring-offset-2":"")} style={{borderTopColor:dep.col}}>
+                <div className="flex items-center justify-between mb-1.5">
+                    <h4 className="font-bold text-xs" style={{color:dep.col}}>{dep.nm}</h4>
+                    {hl&&<span className="text-[9px] bg-green-500 text-white px-1.5 py-0.5 rounded-full font-bold animate-pulse">Nouveau !</span>}
                 </div>
-                <div className={"rounded-lg p-2.5 mb-2 "+(dep.isNew?"bg-green-50 border border-green-200":"bg-gray-50")}>
-                    <div className={"font-bold text-sm "+(dep.isNew?"text-green-700":"")}>{dep.r}</div>
-                    <div className="text-xs text-muted">{dep.p}</div>
+                <div className={"rounded-lg p-2 mb-1.5 "+(hl?"bg-green-50 border border-green-200":"bg-gray-50")}>
+                    <div className={"font-bold text-xs "+(hl?"text-green-700":"")}>{dep.r}</div>
+                    <div className="text-[11px] text-muted">{dep.p}</div>
                 </div>
-                {dep.eq.length>0&&<div className="space-y-1 mt-2">
-                    {dep.eq.map(e=><div key={e.n} className="flex items-center gap-2 text-xs p-1.5 bg-gray-50 rounded">
-                        <div className="w-6 h-6 rounded-full flex items-center justify-center text-white text-[10px] font-bold" style={{background:dep.col}}>{e.n.split(' ').map(w=>w[0]).join('')}</div>
-                        <div><span className="font-medium">{e.n}</span><span className="text-muted ml-1">— {e.p}</span></div>
+                {dep.eq.length>0&&<div className="space-y-1 mt-1.5">
+                    {dep.eq.map(e=><div key={e.n} className={"flex items-center gap-1.5 text-[11px] p-1 rounded "+(e.isNew?"bg-green-50 border border-green-200":"bg-gray-50")}>
+                        <div className="w-5 h-5 rounded-full flex items-center justify-center text-white text-[8px] font-bold flex-shrink-0" style={{background:e.isNew?"#10b981":dep.col}}>{e.n.split(' ').map(w=>w[0]).join('')}</div>
+                        <div className="min-w-0"><div className={"font-medium truncate "+(e.isNew?"text-green-700":"")}>{e.n}</div><div className="text-muted text-[10px] truncate">{e.p}</div>{e.isNew&&<span className="text-[8px] bg-green-500 text-white px-1 py-0.5 rounded-full font-bold">Nouveau !</span>}</div>
                     </div>)}
                 </div>}
-                {dep.eq.length===0&&!dep.isNew&&<div className="text-xs text-muted italic mt-1">Pas de collaborateur direct</div>}
-            </div>)}
+                {dep.eq.length===0&&!hl&&<div className="text-[11px] text-muted italic mt-1">Pas de collaborateur</div>}
+            </div>})}
         </div>
         <div className="bg-white rounded-xl shadow-sm p-4 text-center text-xs text-muted">
             <strong>{ORG.dep.reduce((s,d)=>s+1+d.eq.length,0)+ORG.dir.length+ORG.sup.length}</strong> collaborateurs siège · <strong>14</strong> directeurs d'établissement · <strong>~180</strong> ETP exploitation
